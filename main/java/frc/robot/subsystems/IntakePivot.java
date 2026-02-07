@@ -19,7 +19,7 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
 
   public IntakePivot() {
     pivotMotor = new SparkMax(IntakeConstants.PIVOT_MOTOR_ID, MotorType.kBrushless);
-    pivotEncoder = new DutyCycleEncoder(1);
+    pivotEncoder = new DutyCycleEncoder(9);
     lastPrintTime = 0.0;
 
     SparkMaxConfig pivotConfig = new SparkMaxConfig();
@@ -45,8 +45,13 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
   public void periodic() {
     double now = Timer.getFPGATimestamp();
     if (now - lastPrintTime >= 0.25) {
-      double degrees = pivotEncoder.get() * 360.0;
-      System.out.printf("Intake pivot angle: %.2f degrees%n", degrees);
+      double dutyCycle = pivotEncoder.get();
+      if (pivotEncoder.isConnected()) {
+        double degrees = dutyCycle * 360.0;
+        System.out.printf("Intake pivot angle: %.2f degrees%n", degrees);
+      } else {
+        System.out.printf("Intake pivot encoder not connected (duty cycle=%.3f)%n", dutyCycle);
+      }
       lastPrintTime = now;
     }
   }
