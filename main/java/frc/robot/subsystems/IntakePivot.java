@@ -45,7 +45,7 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
   public void periodic() {
     double now = Timer.getFPGATimestamp();
     if (now - lastPrintTime >= 0.25) {
-      double degrees = pivotEncoder.getAbsolutePosition() * 360.0;
+      double degrees = pivotEncoder.get() * 360.0;
       System.out.printf("Intake pivot angle: %.2f degrees%n", degrees);
       lastPrintTime = now;
     }
