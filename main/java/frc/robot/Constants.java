@@ -88,4 +88,12 @@ public final class Constants
     public static final double KD = 0.0;
     public static final double KF = 0.00018;
   }
+
+  public static final class IntakeConstants
+  {
+    public static final int PIVOT_MOTOR_ID = 30;
+    public static final boolean PIVOT_INVERTED = false;
+    public static final int CURRENT_LIMIT_AMPS = 25;
+    public static final double PIVOT_POWER = 0.05;
+  }
 }

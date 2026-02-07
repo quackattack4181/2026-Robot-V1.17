@@ -15,8 +15,10 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.subsystems.IntakePivot;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
@@ -46,6 +48,7 @@ public class RobotContainer {
   private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
   "swerve/neo"));
   private final Shooter shooter = new Shooter();
+  private final IntakePivot intakePivot = new IntakePivot();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController driverOne = new CommandXboxController(0);
@@ -143,6 +146,10 @@ public class RobotContainer {
                  VisionConstants.LIMELIGHT_NAME));
 
     driverOne.rightTrigger(0.5).whileTrue(shooter.runShooterRpm());
+
+    intakePivot.setDefaultCommand(intakePivot.run(intakePivot::stop));
+    driverOne.povUp().whileTrue(intakePivot.runPivotPower(IntakeConstants.PIVOT_POWER));
+    driverOne.povDown().whileTrue(intakePivot.runPivotPower(-IntakeConstants.PIVOT_POWER));
 
 
 
