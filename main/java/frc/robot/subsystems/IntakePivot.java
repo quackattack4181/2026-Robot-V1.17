@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -52,15 +53,15 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
   }
 
   public void setWheelPower(double power) {
-    wheelMotor.set(power);
+    wheelMotor.set(MathUtil.clamp(power, -1.0, 1.0));
   }
 
   public void stopWheels() {
     wheelMotor.stopMotor();
   }
 
-  public Command runWheels(double speed, double direction) {
-    return startEnd(() -> setWheelPower(speed * direction), this::stopWheels);
+  public Command runWheels(double power) {
+    return startEnd(() -> setWheelPower(power), this::stopWheels);
   }
 
   @Override
