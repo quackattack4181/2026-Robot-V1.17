@@ -136,8 +136,8 @@ public class RobotContainer {
 
     drivebase.setDefaultCommand(!RobotBase.isSimulation() ? driveFieldOrientedDirectAngle : driveFieldOrientedDirectAngleSim);
 
-    // Zero the gyro when driverOne presses A
-    driverOne.a().onTrue(drivebase.runOnce(drivebase::zeroGyro));
+    // Spin intake wheels while driverOne holds A
+    driverOne.a().whileTrue(intakePivot.runWheels(IntakeConstants.WHEEL_SPEED, IntakeConstants.WHEEL_DIRECTION));
 
     driverOne.leftTrigger(0.5)
              .whileTrue(drivebase.driveFieldOrientedWithLimelight(

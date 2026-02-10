@@ -2,9 +2,11 @@ package frc.robot.subsystems;
 
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
@@ -14,11 +16,13 @@ import frc.robot.Constants.IntakeConstants;
 
 public class IntakePivot extends SubsystemBase implements AutoCloseable {
   private final SparkMax pivotMotor;
+  private final SparkFlex wheelMotor;
   private final DutyCycleEncoder pivotEncoder;
   private double lastPrintTime;
 
   public IntakePivot() {
     pivotMotor = new SparkMax(IntakeConstants.PIVOT_MOTOR_ID, MotorType.kBrushless);
+    wheelMotor = new SparkFlex(IntakeConstants.WHEEL_MOTOR_ID, MotorType.kBrushless);
     pivotEncoder = new DutyCycleEncoder(9);
     lastPrintTime = 0.0;
 
@@ -27,6 +31,12 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
     pivotConfig.smartCurrentLimit(IntakeConstants.CURRENT_LIMIT_AMPS);
     pivotConfig.inverted(IntakeConstants.PIVOT_INVERTED);
     pivotMotor.configure(pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    SparkFlexConfig wheelConfig = new SparkFlexConfig();
+    wheelConfig.idleMode(IdleMode.kBrake);
+    wheelConfig.smartCurrentLimit(IntakeConstants.CURRENT_LIMIT_AMPS);
+    wheelConfig.inverted(IntakeConstants.WHEEL_INVERTED);
+    wheelMotor.configure(wheelConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   public void setPivotPower(double power) {
@@ -39,6 +49,18 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
 
   public Command runPivotPower(double power) {
     return startEnd(() -> setPivotPower(power), this::stop);
+  }
+
+  public void setWheelPower(double power) {
+    wheelMotor.set(power);
+  }
+
+  public void stopWheels() {
+    wheelMotor.stopMotor();
+  }
+
+  public Command runWheels(double speed, double direction) {
+    return startEnd(() -> setWheelPower(speed * direction), this::stopWheels);
   }
 
   @Override
@@ -59,6 +81,7 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
   @Override
   public void close() {
     pivotMotor.close();
+    wheelMotor.close();
     pivotEncoder.close();
   }
 }
