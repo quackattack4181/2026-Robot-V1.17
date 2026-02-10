@@ -137,7 +137,7 @@ public class RobotContainer {
     drivebase.setDefaultCommand(!RobotBase.isSimulation() ? driveFieldOrientedDirectAngle : driveFieldOrientedDirectAngleSim);
 
     // Spin intake wheels while driverOne holds A
-    driverOne.a().whileTrue(intakePivot.runWheels(IntakeConstants.WHEEL_POWER));
+    driverOne.a().whileTrue(intakePivot.runWheelsRpm(IntakeConstants.WHEEL_RPM));
 
     driverOne.leftTrigger(0.5)
              .whileTrue(drivebase.driveFieldOrientedWithLimelight(

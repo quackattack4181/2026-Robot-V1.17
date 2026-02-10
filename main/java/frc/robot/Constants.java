@@ -97,6 +97,10 @@ public final class Constants
     public static final boolean WHEEL_INVERTED = false;
     public static final int CURRENT_LIMIT_AMPS = 25;
     public static final double PIVOT_POWER = 0.30;
-    public static final double WHEEL_POWER = 0.50;
+    public static final double WHEEL_RPM = 2000.0;
+    public static final double WHEEL_KP = 0.00025;
+    public static final double WHEEL_KI = 0.0;
+    public static final double WHEEL_KD = 0.0;
+    public static final double WHEEL_KF = 0.00018;
   }
 }

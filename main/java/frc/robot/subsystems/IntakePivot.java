@@ -1,14 +1,16 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -18,6 +20,8 @@ import frc.robot.Constants.IntakeConstants;
 public class IntakePivot extends SubsystemBase implements AutoCloseable {
   private final SparkMax pivotMotor;
   private final SparkFlex wheelMotor;
+  private final RelativeEncoder wheelEncoder;
+  private final SparkClosedLoopController wheelPid;
   private final DutyCycleEncoder pivotEncoder;
   private double lastPrintTime;
 
@@ -37,7 +41,15 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
     wheelConfig.idleMode(IdleMode.kBrake);
     wheelConfig.smartCurrentLimit(IntakeConstants.CURRENT_LIMIT_AMPS);
     wheelConfig.inverted(IntakeConstants.WHEEL_INVERTED);
+    wheelConfig.closedLoop.pidf(
+        IntakeConstants.WHEEL_KP,
+        IntakeConstants.WHEEL_KI,
+        IntakeConstants.WHEEL_KD,
+        IntakeConstants.WHEEL_KF);
     wheelMotor.configure(wheelConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    wheelEncoder = wheelMotor.getEncoder();
+    wheelPid = wheelMotor.getClosedLoopController();
   }
 
   public void setPivotPower(double power) {
@@ -52,16 +64,24 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
     return startEnd(() -> setPivotPower(power), this::stop);
   }
 
-  public void setWheelPower(double power) {
-    wheelMotor.set(MathUtil.clamp(power, -1.0, 1.0));
+  public void setWheelRpm(double rpm) {
+    wheelPid.setReference(rpm, ControlType.kVelocity);
+  }
+
+  public double getWheelRpm() {
+    return wheelEncoder.getVelocity();
   }
 
   public void stopWheels() {
     wheelMotor.stopMotor();
   }
 
-  public Command runWheels(double power) {
-    return startEnd(() -> setWheelPower(power), this::stopWheels);
+  public Command runWheelsRpm(double rpm) {
+    return runEnd(() -> setWheelRpm(rpm), this::stopWheels);
+  }
+
+  public Command runWheelsRpm() {
+    return runWheelsRpm(IntakeConstants.WHEEL_RPM);
   }
 
   @Override
