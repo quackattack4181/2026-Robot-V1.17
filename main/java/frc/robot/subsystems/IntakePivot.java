@@ -20,6 +20,7 @@ import frc.robot.Constants.IntakeConstants;
 public class IntakePivot extends SubsystemBase implements AutoCloseable {
   private final SparkMax pivotMotor;
   private final SparkFlex wheelMotor;
+  private final SparkFlex wheelFollowerMotor;
   private final RelativeEncoder wheelEncoder;
   private final SparkClosedLoopController wheelPid;
   private final DutyCycleEncoder pivotEncoder;
@@ -28,6 +29,7 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
   public IntakePivot() {
     pivotMotor = new SparkMax(IntakeConstants.PIVOT_MOTOR_ID, MotorType.kBrushless);
     wheelMotor = new SparkFlex(IntakeConstants.WHEEL_MOTOR_ID, MotorType.kBrushless);
+    wheelFollowerMotor = new SparkFlex(IntakeConstants.WHEEL_FOLLOWER_MOTOR_ID, MotorType.kBrushless);
     pivotEncoder = new DutyCycleEncoder(9);
     lastPrintTime = 0.0;
 
@@ -47,6 +49,15 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
         IntakeConstants.WHEEL_KD,
         IntakeConstants.WHEEL_KF);
     wheelMotor.configure(wheelConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    SparkFlexConfig wheelFollowerConfig = new SparkFlexConfig();
+    wheelFollowerConfig.idleMode(IdleMode.kBrake);
+    wheelFollowerConfig.smartCurrentLimit(IntakeConstants.CURRENT_LIMIT_AMPS);
+    wheelFollowerConfig.follow(wheelMotor, IntakeConstants.WHEEL_FOLLOWER_INVERTED);
+    wheelFollowerMotor.configure(
+        wheelFollowerConfig,
+        ResetMode.kResetSafeParameters,
+        PersistMode.kPersistParameters);
 
     wheelEncoder = wheelMotor.getEncoder();
     wheelPid = wheelMotor.getClosedLoopController();
@@ -103,6 +114,7 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
   public void close() {
     pivotMotor.close();
     wheelMotor.close();
+    wheelFollowerMotor.close();
     pivotEncoder.close();
   }
 }

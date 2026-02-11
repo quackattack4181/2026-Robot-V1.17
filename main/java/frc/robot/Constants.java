@@ -93,8 +93,10 @@ public final class Constants
   {
     public static final int PIVOT_MOTOR_ID = 30;
     public static final int WHEEL_MOTOR_ID = 31;
+    public static final int WHEEL_FOLLOWER_MOTOR_ID = 32;
     public static final boolean PIVOT_INVERTED = false;
     public static final boolean WHEEL_INVERTED = false;
+    public static final boolean WHEEL_FOLLOWER_INVERTED = true;
     public static final int CURRENT_LIMIT_AMPS = 25;
     public static final double PIVOT_POWER = 0.30;
     public static final double WHEEL_RPM = 2000.0;
