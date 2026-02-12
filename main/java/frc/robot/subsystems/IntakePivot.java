@@ -5,11 +5,9 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
@@ -19,8 +17,7 @@ import frc.robot.Constants.IntakeConstants;
 
 public class IntakePivot extends SubsystemBase implements AutoCloseable {
   private final SparkMax pivotMotor;
-  private final SparkFlex wheelMotor;
-  private final SparkFlex wheelFollowerMotor;
+  private final SparkMax wheelMotor;
   private final RelativeEncoder wheelEncoder;
   private final SparkClosedLoopController wheelPid;
   private final DutyCycleEncoder pivotEncoder;
@@ -28,8 +25,7 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
 
   public IntakePivot() {
     pivotMotor = new SparkMax(IntakeConstants.PIVOT_MOTOR_ID, MotorType.kBrushless);
-    wheelMotor = new SparkFlex(IntakeConstants.WHEEL_MOTOR_ID, MotorType.kBrushless);
-    wheelFollowerMotor = new SparkFlex(IntakeConstants.WHEEL_FOLLOWER_MOTOR_ID, MotorType.kBrushless);
+    wheelMotor = new SparkMax(IntakeConstants.WHEEL_MOTOR_ID, MotorType.kBrushless);
     pivotEncoder = new DutyCycleEncoder(9);
     lastPrintTime = 0.0;
 
@@ -39,7 +35,7 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
     pivotConfig.inverted(IntakeConstants.PIVOT_INVERTED);
     pivotMotor.configure(pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    SparkFlexConfig wheelConfig = new SparkFlexConfig();
+    SparkMaxConfig wheelConfig = new SparkMaxConfig();
     wheelConfig.idleMode(IdleMode.kBrake);
     wheelConfig.smartCurrentLimit(IntakeConstants.CURRENT_LIMIT_AMPS);
     wheelConfig.inverted(IntakeConstants.WHEEL_INVERTED);
@@ -49,15 +45,6 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
         IntakeConstants.WHEEL_KD,
         IntakeConstants.WHEEL_KF);
     wheelMotor.configure(wheelConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-    SparkFlexConfig wheelFollowerConfig = new SparkFlexConfig();
-    wheelFollowerConfig.idleMode(IdleMode.kBrake);
-    wheelFollowerConfig.smartCurrentLimit(IntakeConstants.CURRENT_LIMIT_AMPS);
-    wheelFollowerConfig.follow(wheelMotor, IntakeConstants.WHEEL_FOLLOWER_INVERTED);
-    wheelFollowerMotor.configure(
-        wheelFollowerConfig,
-        ResetMode.kResetSafeParameters,
-        PersistMode.kPersistParameters);
 
     wheelEncoder = wheelMotor.getEncoder();
     wheelPid = wheelMotor.getClosedLoopController();
@@ -114,7 +101,6 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
   public void close() {
     pivotMotor.close();
     wheelMotor.close();
-    wheelFollowerMotor.close();
     pivotEncoder.close();
   }
 }
