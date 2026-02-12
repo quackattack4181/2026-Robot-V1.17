@@ -92,7 +92,7 @@ public final class Constants
   public static final class IntakeConstants
   {
     public static final int PIVOT_MOTOR_ID = 30;
-    public static final int WHEEL_MOTOR_ID = 32;
+    public static final int WHEEL_MOTOR_ID = 31;
     public static final boolean PIVOT_INVERTED = false;
     public static final boolean WHEEL_INVERTED = false;
     public static final int CURRENT_LIMIT_AMPS = 25;
