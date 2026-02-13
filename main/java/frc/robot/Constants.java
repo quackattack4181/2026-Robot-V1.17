@@ -72,28 +72,34 @@ public final class Constants
 
   public static final class ShooterConstants
   {
-    public static final int TOP_MOTOR_ID = 20;
-    public static final int MIDDLE_MOTOR_ID = 21;
-    public static final int BOTTOM_MOTOR_ID = 22;
+    public static final int SHOOTER_INTAKE_MOTOR_ID = 20;
+    public static final int MIDDLE_SHOOTER_MOTOR_ID = 21;
+    public static final int TOP_SHOOTER_MOTOR_ID = 22;
 
-    public static final boolean TOP_INVERTED = true;
-    public static final boolean MIDDLE_INVERTED = false;
-    public static final boolean BOTTOM_INVERTED = true;
+    public static final boolean SHOOTER_INTAKE_INVERTED = false;
+    public static final boolean MIDDLE_SHOOTER_INVERTED = false;
+    public static final boolean TOP_SHOOTER_INVERTED = true;
 
     public static final int CURRENT_LIMIT_AMPS = 40;
     public static final double SHOOTER_RPM = 2000.0;
+    public static final double SHOOTER_INTAKE_RPM = 1800.0;
     public static final double SHOOTER_RPM_AT_5FT = 2000.0;
     public static final double SHOOTER_RPM_AT_10FT = 2200.0;
     public static final double SHOOTER_RPM_AT_15FT = 2400.0;
     public static final double SHOOTER_RPM_AT_20FT = 2600.0;
     public static final double SHOOTER_RPM_AT_25FT = 2800.0;
     public static final double VELOCITY_TOLERANCE_RPM = 150.0;
-    public static final double TOP_MOTOR_START_DELAY_SECONDS = 0.5;
+    public static final double SHOOTER_INTAKE_START_DELAY_SECONDS = 0.5;
 
-    public static final double KP = 0.00025;
-    public static final double KI = 0.0;
-    public static final double KD = 0.0;
-    public static final double KF = 0.00018;
+    public static final double SHOOTER_KP = 0.00025;
+    public static final double SHOOTER_KI = 0.0;
+    public static final double SHOOTER_KD = 0.0;
+    public static final double SHOOTER_KF = 0.00018;
+
+    public static final double SHOOTER_INTAKE_KP = 0.00025;
+    public static final double SHOOTER_INTAKE_KI = 0.0;
+    public static final double SHOOTER_INTAKE_KD = 0.0;
+    public static final double SHOOTER_INTAKE_KF = 0.00018;
   }
 
   public static final class IntakeConstants
