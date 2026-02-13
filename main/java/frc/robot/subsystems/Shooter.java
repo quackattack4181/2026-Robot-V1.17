@@ -26,7 +26,6 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
   private final RelativeEncoder topShooterEncoder;
   private final SparkClosedLoopController middleShooterPid;
   private final SparkClosedLoopController topShooterPid;
-  private final SparkClosedLoopController shooterIntakePid;
 
   public Shooter() {
     shooterIntakeMotor = new SparkMax(ShooterConstants.SHOOTER_INTAKE_MOTOR_ID, MotorType.kBrushless);
@@ -37,11 +36,6 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
     intakeConfig.idleMode(IdleMode.kCoast);
     intakeConfig.smartCurrentLimit(ShooterConstants.CURRENT_LIMIT_AMPS);
     intakeConfig.inverted(ShooterConstants.SHOOTER_INTAKE_INVERTED);
-    intakeConfig.closedLoop.pidf(
-        ShooterConstants.SHOOTER_INTAKE_KP,
-        ShooterConstants.SHOOTER_INTAKE_KI,
-        ShooterConstants.SHOOTER_INTAKE_KD,
-        ShooterConstants.SHOOTER_INTAKE_KF);
     shooterIntakeMotor.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     SparkFlexConfig middleConfig = new SparkFlexConfig();
@@ -69,7 +63,6 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
     topShooterEncoder = topShooterMotor.getEncoder();
     middleShooterPid = middleShooterMotor.getClosedLoopController();
     topShooterPid = topShooterMotor.getClosedLoopController();
-    shooterIntakePid = shooterIntakeMotor.getClosedLoopController();
   }
 
   public void stop() {
@@ -83,8 +76,8 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
     topShooterPid.setReference(rpm, ControlType.kVelocity);
   }
 
-  public void setShooterIntakeRpm(double rpm) {
-    shooterIntakePid.setReference(rpm, ControlType.kVelocity);
+  public void setShooterIntakePower(double power) {
+    shooterIntakeMotor.set(MathUtil.clamp(power, -1.0, 1.0));
   }
 
   public double getShooterRpm() {
@@ -131,14 +124,14 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
   }
 
   public Command runShooterRpm(double shooterRpm) {
-    return runShooterRpm(() -> shooterRpm, () -> ShooterConstants.SHOOTER_INTAKE_RPM);
+    return runShooterRpm(() -> shooterRpm, () -> ShooterConstants.SHOOTER_INTAKE_POWER);
   }
 
   public Command runShooterRpm(DoubleSupplier shooterRpmSupplier) {
-    return runShooterRpm(shooterRpmSupplier, () -> ShooterConstants.SHOOTER_INTAKE_RPM);
+    return runShooterRpm(shooterRpmSupplier, () -> ShooterConstants.SHOOTER_INTAKE_POWER);
   }
 
-  public Command runShooterRpm(DoubleSupplier shooterRpmSupplier, DoubleSupplier intakeRpmSupplier) {
+  public Command runShooterRpm(DoubleSupplier shooterRpmSupplier, DoubleSupplier intakePowerSupplier) {
     final double[] startTimestamp = {-1.0};
     return runEnd(
         () -> {
@@ -150,7 +143,7 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
 
           if (Timer.getFPGATimestamp() - startTimestamp[0]
               >= ShooterConstants.SHOOTER_INTAKE_START_DELAY_SECONDS) {
-            setShooterIntakeRpm(intakeRpmSupplier.getAsDouble());
+            setShooterIntakePower(intakePowerSupplier.getAsDouble());
           } else {
             shooterIntakeMotor.stopMotor();
           }
