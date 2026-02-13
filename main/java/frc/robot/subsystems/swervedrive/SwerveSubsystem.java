@@ -81,10 +81,10 @@ public class SwerveSubsystem extends SubsystemBase
    */
   private final boolean visionDriveTest = false;
   /**
-   * NetworkTables entry for Limelight distance in feet (Elastic/Glass).
+   * NetworkTables entry for Limelight distance in inches (Elastic/Glass).
    */
-  private final NetworkTableEntry limelightDistanceFeetEntry =
-      NetworkTableInstance.getDefault().getTable("Elastic").getEntry("Limelight Distance (ft)");
+  private final NetworkTableEntry limelightDistanceInchesEntry =
+      NetworkTableInstance.getDefault().getTable("Elastic").getEntry("Limelight Distance (in)");
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -166,8 +166,8 @@ public class SwerveSubsystem extends SubsystemBase
       swerveDrive.updateOdometry();
       // vision.updatePoseEstimation(swerveDrive);
     }
-    limelightDistanceFeetEntry.setDouble(
-        getLimelightTargetDistanceFeet(Constants.VisionConstants.LIMELIGHT_NAME));
+    limelightDistanceInchesEntry.setDouble(
+        getLimelightTargetDistanceInches(Constants.VisionConstants.LIMELIGHT_NAME));
   }
 
   @Override
@@ -683,23 +683,23 @@ public class SwerveSubsystem extends SubsystemBase
       return Double.NaN;
     }
 
-    return heightDifference / Math.tan(angleToTargetRadians);
+    return Math.abs(heightDifference / Math.tan(angleToTargetRadians));
   }
 
   /**
-   * Get the planar distance to the current Limelight target in feet.
+   * Get the planar distance to the current Limelight target in inches.
    *
    * @param limelightName Limelight network table name.
-   * @return Distance to target in feet, or {@code Double.NaN} if no target.
+   * @return Distance to target in inches, or {@code Double.NaN} if no target.
    */
-  public double getLimelightTargetDistanceFeet(String limelightName)
+  public double getLimelightTargetDistanceInches(String limelightName)
   {
     double distanceMeters = getLimelightTargetDistanceMeters(limelightName);
     if (Double.isNaN(distanceMeters))
     {
       return Double.NaN;
     }
-    return Units.metersToFeet(distanceMeters);
+    return Units.metersToInches(distanceMeters);
   }
 
   /**

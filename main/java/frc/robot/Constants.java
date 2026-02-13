@@ -59,7 +59,7 @@ public final class Constants
     public static final double AIM_KD = 0.002;
     public static final double AIM_TOLERANCE_DEGREES = 0.5;
     public static final double AIM_MAX_ANGULAR_VELOCITY_RAD_PER_SEC = 4.0;
-    public static final double LIMELIGHT_HEIGHT_METERS = Units.inchesToMeters(8.0);
+    public static final double LIMELIGHT_HEIGHT_METERS = Units.inchesToMeters(18.5);
     public static final double APRILTAG_HEIGHT_METERS = Units.feetToMeters(5.0);
     public static final double LIMELIGHT_PITCH_DEGREES = 25.0;
   }
