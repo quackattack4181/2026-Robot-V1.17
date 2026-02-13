@@ -671,20 +671,15 @@ public class SwerveSubsystem extends SubsystemBase
     {
       return Double.NaN;
     }
-    double targetHeight = Constants.VisionConstants.APRILTAG_HEIGHT_METERS;
-    double cameraHeight = Constants.VisionConstants.LIMELIGHT_HEIGHT_METERS;
-    double cameraPitchDegrees = Constants.VisionConstants.LIMELIGHT_PITCH_DEGREES;
-    double calibrationDegrees = Constants.VisionConstants.LIMELIGHT_DISTANCE_CALIBRATION_DEGREES;
-    double targetOffsetDegrees = LimelightHelpers.getTY(limelightName);
-    double angleToTargetRadians = Units.degreesToRadians(cameraPitchDegrees + calibrationDegrees + targetOffsetDegrees);
-    double heightDifference = targetHeight - cameraHeight;
 
-    if (Math.abs(Math.tan(angleToTargetRadians)) < 1e-6)
+    Pose3d targetPoseCameraSpace = LimelightHelpers.getTargetPose3d_CameraSpace(limelightName);
+    if (targetPoseCameraSpace == null)
     {
       return Double.NaN;
     }
 
-    return Math.abs(heightDifference / Math.tan(angleToTargetRadians));
+    double distanceMeters = targetPoseCameraSpace.getTranslation().getNorm();
+    return distanceMeters > 1e-6 ? distanceMeters : Double.NaN;
   }
 
   /**
