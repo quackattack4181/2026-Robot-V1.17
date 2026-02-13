@@ -695,7 +695,8 @@ public class SwerveSubsystem extends SubsystemBase
     {
       return Double.NaN;
     }
-    return Units.metersToInches(distanceMeters)
+    double rawInches = Units.metersToInches(distanceMeters);
+    return rawInches * Constants.VisionConstants.LIMELIGHT_DISTANCE_SCALE
            + Constants.VisionConstants.LIMELIGHT_DISTANCE_OFFSET_INCHES;
   }
 
