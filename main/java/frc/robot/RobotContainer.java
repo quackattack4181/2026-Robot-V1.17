@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -22,10 +24,16 @@ import frc.robot.subsystems.IntakePivot;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
 // import edu.wpi.first.wpilibj2.command.InstantCommand;
 // import edu.wpi.first.wpilibj2.command.RunCommand;
 // import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -43,6 +51,7 @@ public class RobotContainer {
   private final NetworkTableEntry autoSelectedEntry;
   private final NetworkTableEntry autoOptionsEntry;
   private final Map<String, Command> autoOptions = new LinkedHashMap<>();
+  private final SendableChooser<String> autoChooser = new SendableChooser<>();
 
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
@@ -102,12 +111,8 @@ public class RobotContainer {
     //         .map(alliance -> alliance == DriverStation.Alliance.Blue)
     //         .orElse(false); // Default to Red if unknown
 
-    // ✅ Add mirrored PathPlanner autos to the chooser
-    autoOptions.put("Middle", new PathPlannerAuto("Middle", isBlueAlliance));
-    autoOptions.put("Left", new PathPlannerAuto("Left", isBlueAlliance));
-    autoOptions.put("Right", new PathPlannerAuto("Right", isBlueAlliance));
-    autoOptionsEntry.setStringArray(autoOptions.keySet().toArray(new String[0]));
-    autoSelectedEntry.setString("Middle");
+    // Auto-discover PathPlanner autos/paths from deploy and publish to Elastic.
+    loadAutoOptions(isBlueAlliance);
 
     NamedCommands.registerCommand("AlignToTag", drivebase.aimAtLimelightTarget(VisionConstants.LIMELIGHT_NAME));
     
@@ -162,6 +167,60 @@ public class RobotContainer {
 
   }
 
+  private void loadAutoOptions(boolean isBlueAlliance) {
+    autoOptions.clear();
+
+    Path pathplannerDir = Filesystem.getDeployDirectory().toPath().resolve("pathplanner");
+    Path autosDir = pathplannerDir.resolve("autos");
+
+    if (Files.isDirectory(autosDir)) {
+      try (var files = Files.list(autosDir).filter(path -> path.toString().endsWith(".auto"))
+          .sorted(Comparator.comparing(path -> path.getFileName().toString()))) {
+        files.forEach(path -> {
+          String fileName = path.getFileName().toString();
+          String autoName = fileName.substring(0, fileName.length() - 5);
+          autoOptions.put(autoName, new PathPlannerAuto(autoName, isBlueAlliance));
+        });
+      } catch (IOException e) {
+        System.err.println("Failed to read PathPlanner autos: " + e.getMessage());
+      }
+    }
+
+    if (Files.isDirectory(pathplannerDir)) {
+      try (var files = Files.list(pathplannerDir).filter(path -> path.toString().endsWith(".path"))
+          .sorted(Comparator.comparing(path -> path.getFileName().toString()))) {
+        files.forEach(path -> {
+          String fileName = path.getFileName().toString();
+          String pathName = fileName.substring(0, fileName.length() - 5);
+          String optionName = "Path: " + pathName;
+          autoOptions.putIfAbsent(
+              optionName,
+              AutoBuilder.followPath(PathPlannerPath.fromPathFile(pathName)));
+        });
+      } catch (IOException e) {
+        System.err.println("Failed to read PathPlanner paths: " + e.getMessage());
+      }
+    }
+
+    autoOptionsEntry.setStringArray(autoOptions.keySet().toArray(new String[0]));
+    if (autoOptions.isEmpty()) {
+      autoSelectedEntry.setString("");
+      SmartDashboard.putData("Auto Chooser", autoChooser);
+      return;
+    }
+
+    String defaultSelection = autoOptions.keySet().iterator().next();
+    autoChooser.setDefaultOption(defaultSelection, defaultSelection);
+    for (String option : autoOptions.keySet()) {
+      if (!option.equals(defaultSelection)) {
+        autoChooser.addOption(option, option);
+      }
+    }
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+    autoSelectedEntry.setString(defaultSelection);
+  }
+
+
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -170,9 +229,14 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
 
-    // An example command will be run in autonomous
-    String selectedAuto = autoSelectedEntry.getString("Middle");
-    return autoOptions.getOrDefault(selectedAuto, autoOptions.get("Middle"));
+    if (autoOptions.isEmpty()) {
+      return null;
+    }
+
+    String fallbackAuto = autoOptions.keySet().iterator().next();
+    String chooserSelection = autoChooser.getSelected();
+    String selectedAuto = chooserSelection != null ? chooserSelection : autoSelectedEntry.getString(fallbackAuto);
+    return autoOptions.getOrDefault(selectedAuto, autoOptions.get(fallbackAuto));
   }
 
   public void setDriveMode()
