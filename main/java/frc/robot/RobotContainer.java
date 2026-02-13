@@ -193,9 +193,13 @@ public class RobotContainer {
           String fileName = path.getFileName().toString();
           String pathName = fileName.substring(0, fileName.length() - 5);
           String optionName = "Path: " + pathName;
-          autoOptions.putIfAbsent(
-              optionName,
-              AutoBuilder.followPath(PathPlannerPath.fromPathFile(pathName)));
+          try {
+            autoOptions.putIfAbsent(
+                optionName,
+                AutoBuilder.followPath(PathPlannerPath.fromPathFile(pathName)));
+          } catch (IOException e) {
+            System.err.println("Failed to load PathPlanner path '" + pathName + "': " + e.getMessage());
+          }
         });
       } catch (IOException e) {
         System.err.println("Failed to read PathPlanner paths: " + e.getMessage());
