@@ -88,6 +88,7 @@ public final class Constants
     public static final double SHOOTER_RPM_AT_20FT = 2600.0;
     public static final double SHOOTER_RPM_AT_25FT = 2800.0;
     public static final double VELOCITY_TOLERANCE_RPM = 150.0;
+    public static final double TOP_MOTOR_START_DELAY_SECONDS = 0.5;
 
     public static final double KP = 0.00025;
     public static final double KI = 0.0;
