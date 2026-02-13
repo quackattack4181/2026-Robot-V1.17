@@ -62,6 +62,8 @@ public final class Constants
     public static final double LIMELIGHT_HEIGHT_METERS = Units.inchesToMeters(18.5);
     public static final double APRILTAG_HEIGHT_METERS = Units.feetToMeters(5.0);
     public static final double LIMELIGHT_PITCH_DEGREES = 25.0;
+    // Tune this with a tape measure reference point (positive lowers reported distance).
+    public static final double LIMELIGHT_DISTANCE_CALIBRATION_DEGREES = 4.9;
   }
   public static class CustomConstants
   {

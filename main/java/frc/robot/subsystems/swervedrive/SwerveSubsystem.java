@@ -674,8 +674,9 @@ public class SwerveSubsystem extends SubsystemBase
     double targetHeight = Constants.VisionConstants.APRILTAG_HEIGHT_METERS;
     double cameraHeight = Constants.VisionConstants.LIMELIGHT_HEIGHT_METERS;
     double cameraPitchDegrees = Constants.VisionConstants.LIMELIGHT_PITCH_DEGREES;
+    double calibrationDegrees = Constants.VisionConstants.LIMELIGHT_DISTANCE_CALIBRATION_DEGREES;
     double targetOffsetDegrees = LimelightHelpers.getTY(limelightName);
-    double angleToTargetRadians = Units.degreesToRadians(cameraPitchDegrees + targetOffsetDegrees);
+    double angleToTargetRadians = Units.degreesToRadians(cameraPitchDegrees + calibrationDegrees + targetOffsetDegrees);
     double heightDifference = targetHeight - cameraHeight;
 
     if (Math.abs(Math.tan(angleToTargetRadians)) < 1e-6)
