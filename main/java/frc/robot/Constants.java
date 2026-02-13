@@ -62,7 +62,7 @@ public final class Constants
     // Linear calibration for Limelight distance inches: calibrated = raw * scale + offset.
     // Defaults fit two tape-measure points: (raw 68.0 -> true 68.0), (raw 103.5 -> true 105.0).
     public static final double LIMELIGHT_DISTANCE_SCALE = 1.0422535;
-    public static final double LIMELIGHT_DISTANCE_OFFSET_INCHES = -2.8732394;
+    public static final double LIMELIGHT_DISTANCE_OFFSET_INCHES = 0.0;
   }
   public static class CustomConstants
   {
@@ -82,6 +82,11 @@ public final class Constants
 
     public static final int CURRENT_LIMIT_AMPS = 40;
     public static final double SHOOTER_RPM = 2000.0;
+    public static final double SHOOTER_RPM_AT_5FT = 2000.0;
+    public static final double SHOOTER_RPM_AT_10FT = 2200.0;
+    public static final double SHOOTER_RPM_AT_15FT = 2400.0;
+    public static final double SHOOTER_RPM_AT_20FT = 2600.0;
+    public static final double SHOOTER_RPM_AT_25FT = 2800.0;
     public static final double VELOCITY_TOLERANCE_RPM = 150.0;
 
     public static final double KP = 0.00025;

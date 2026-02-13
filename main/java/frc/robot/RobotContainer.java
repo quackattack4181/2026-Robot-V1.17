@@ -145,7 +145,10 @@ public class RobotContainer {
                  () -> MathUtil.applyDeadband(-driverOne.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
                  VisionConstants.LIMELIGHT_NAME));
 
-    driverOne.rightTrigger(0.5).whileTrue(shooter.runShooterRpm());
+    driverOne.rightTrigger(0.5).whileTrue(
+        shooter.runShooterRpm(
+            () -> shooter.getTargetRpmForDistanceInches(
+                drivebase.getLimelightTargetDistanceInches(VisionConstants.LIMELIGHT_NAME))));
 
     intakePivot.setDefaultCommand(intakePivot.run(intakePivot::stop));
     driverOne.povUp().whileTrue(intakePivot.runPivotPower(IntakeConstants.PIVOT_POWER));

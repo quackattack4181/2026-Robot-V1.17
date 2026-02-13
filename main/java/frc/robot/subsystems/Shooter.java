@@ -9,6 +9,7 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ShooterConstants;
@@ -74,8 +75,46 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
         <= ShooterConstants.VELOCITY_TOLERANCE_RPM;
   }
 
+  public double getTargetRpmForDistanceInches(double distanceInches) {
+    if (Double.isNaN(distanceInches) || Double.isInfinite(distanceInches)) {
+      return ShooterConstants.SHOOTER_RPM;
+    }
+
+    double distanceFeet = distanceInches / 12.0;
+    double[] distancePoints = {5.0, 10.0, 15.0, 20.0, 25.0};
+    double[] rpmPoints = {
+        ShooterConstants.SHOOTER_RPM_AT_5FT,
+        ShooterConstants.SHOOTER_RPM_AT_10FT,
+        ShooterConstants.SHOOTER_RPM_AT_15FT,
+        ShooterConstants.SHOOTER_RPM_AT_20FT,
+        ShooterConstants.SHOOTER_RPM_AT_25FT};
+
+    if (distanceFeet <= distancePoints[0]) {
+      return rpmPoints[0];
+    }
+
+    if (distanceFeet >= distancePoints[distancePoints.length - 1]) {
+      return rpmPoints[rpmPoints.length - 1];
+    }
+
+    for (int i = 0; i < distancePoints.length - 1; i++) {
+      double lowDistance = distancePoints[i];
+      double highDistance = distancePoints[i + 1];
+      if (distanceFeet >= lowDistance && distanceFeet <= highDistance) {
+        double t = (distanceFeet - lowDistance) / (highDistance - lowDistance);
+        return MathUtil.interpolate(rpmPoints[i], rpmPoints[i + 1], t);
+      }
+    }
+
+    return ShooterConstants.SHOOTER_RPM;
+  }
+
   public Command runShooterRpm(double rpm) {
     return runEnd(() -> setShooterRpm(rpm), this::stop);
+  }
+
+  public Command runShooterRpm(java.util.function.DoubleSupplier rpmSupplier) {
+    return runEnd(() -> setShooterRpm(rpmSupplier.getAsDouble()), this::stop);
   }
 
   public Command runShooterRpm() {
