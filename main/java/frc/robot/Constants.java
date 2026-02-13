@@ -59,6 +59,8 @@ public final class Constants
     public static final double AIM_KD = 0.002;
     public static final double AIM_TOLERANCE_DEGREES = 0.5;
     public static final double AIM_MAX_ANGULAR_VELOCITY_RAD_PER_SEC = 4.0;
+    // Positive adds to reported distance for final on-robot calibration.
+    public static final double LIMELIGHT_DISTANCE_OFFSET_INCHES = 2.5;
   }
   public static class CustomConstants
   {
