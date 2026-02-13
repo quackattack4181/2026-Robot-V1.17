@@ -61,7 +61,7 @@ public final class Constants
     public static final double AIM_MAX_ANGULAR_VELOCITY_RAD_PER_SEC = 4.0;
     public static final double LIMELIGHT_HEIGHT_METERS = Units.inchesToMeters(18.5);
     public static final double APRILTAG_HEIGHT_METERS = Units.feetToMeters(5.0);
-    public static final double LIMELIGHT_PITCH_DEGREES = 25.0;
+    public static final double LIMELIGHT_PITCH_DEGREES = 27.5;
     // Tune this with a tape measure reference point (positive lowers reported distance).
     public static final double LIMELIGHT_DISTANCE_CALIBRATION_DEGREES = 4.9;
   }
