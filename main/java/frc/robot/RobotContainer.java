@@ -197,7 +197,7 @@ public class RobotContainer {
             autoOptions.putIfAbsent(
                 optionName,
                 AutoBuilder.followPath(PathPlannerPath.fromPathFile(pathName)));
-          } catch (IOException e) {
+          } catch (Exception e) {
             System.err.println("Failed to load PathPlanner path '" + pathName + "': " + e.getMessage());
           }
         });
