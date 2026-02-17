@@ -50,6 +50,47 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
     return startEnd(() -> setPivotPower(power), this::stop);
   }
 
+
+  public double getPivotAngleDegrees() {
+    return pivotEncoder.get() * 360.0;
+  }
+
+  private double clockwiseDistanceToTarget(double currentDegrees, double targetDegrees) {
+    return (currentDegrees - targetDegrees + 360.0) % 360.0;
+  }
+
+  private double counterClockwiseDistanceToTarget(double currentDegrees, double targetDegrees) {
+    return (targetDegrees - currentDegrees + 360.0) % 360.0;
+  }
+
+  public Command runPivotClockwiseToAngle(double targetDegrees) {
+    return runEnd(
+        () -> {
+          double current = getPivotAngleDegrees();
+          double remaining = clockwiseDistanceToTarget(current, targetDegrees);
+          if (remaining > IntakeConstants.PIVOT_ANGLE_TOLERANCE_DEGREES) {
+            setPivotPower(-Math.abs(IntakeConstants.PIVOT_POWER));
+          } else {
+            stop();
+          }
+        },
+        this::stop);
+  }
+
+  public Command runPivotCounterClockwiseToAngle(double targetDegrees) {
+    return runEnd(
+        () -> {
+          double current = getPivotAngleDegrees();
+          double remaining = counterClockwiseDistanceToTarget(current, targetDegrees);
+          if (remaining > IntakeConstants.PIVOT_ANGLE_TOLERANCE_DEGREES) {
+            setPivotPower(Math.abs(IntakeConstants.PIVOT_POWER));
+          } else {
+            stop();
+          }
+        },
+        this::stop);
+  }
+
   public void setWheelPower(double power) {
     wheelMotor.set(power);
   }
@@ -72,7 +113,7 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
     if (now - lastPrintTime >= 0.25) {
       double dutyCycle = pivotEncoder.get();
       if (pivotEncoder.isConnected()) {
-        double degrees = dutyCycle * 360.0;
+        double degrees = getPivotAngleDegrees();
         System.out.printf("Intake pivot angle: %.2f degrees%n", degrees);
       } else {
         System.out.printf("Intake pivot encoder not connected (duty cycle=%.3f)%n", dutyCycle);

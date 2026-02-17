@@ -156,8 +156,10 @@ public class RobotContainer {
                 drivebase.getLimelightTargetDistanceInches(VisionConstants.LIMELIGHT_NAME))));
 
     intakePivot.setDefaultCommand(intakePivot.run(intakePivot::stop));
-    driverOne.povUp().whileTrue(intakePivot.runPivotPower(IntakeConstants.PIVOT_POWER));
-    driverOne.povDown().whileTrue(intakePivot.runPivotPower(-IntakeConstants.PIVOT_POWER));
+    driverOne.povUp().whileTrue(
+        intakePivot.runPivotCounterClockwiseToAngle(IntakeConstants.PIVOT_IN_ANGLE_DEGREES));
+    driverOne.povDown().whileTrue(
+        intakePivot.runPivotClockwiseToAngle(IntakeConstants.PIVOT_OUT_ANGLE_DEGREES));
 
 
 
