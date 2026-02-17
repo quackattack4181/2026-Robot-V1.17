@@ -76,30 +76,30 @@ public final class Constants
     public static final int MIDDLE_SHOOTER_MOTOR_ID = 21;
     public static final int TOP_SHOOTER_MOTOR_ID = 22;
 
-    public static final boolean SHOOTER_INTAKE_INVERTED = false;
+    public static final boolean SHOOTER_INTAKE_INVERTED = true;
     public static final boolean MIDDLE_SHOOTER_INVERTED = true;
     public static final boolean TOP_SHOOTER_INVERTED = false;
 
     public static final int CURRENT_LIMIT_AMPS = 40;
     public static final double SHOOTER_RPM = 2000.0;
-    public static final double SHOOTER_INTAKE_POWER = 0.55;
-    public static final double SHOOTER_RPM_AT_5FT = 2000.0;
-    public static final double SHOOTER_RPM_AT_10FT = 2200.0;
-    public static final double SHOOTER_RPM_AT_15FT = 2400.0;
-    public static final double SHOOTER_RPM_AT_20FT = 2600.0;
-    public static final double SHOOTER_RPM_AT_25FT = 2800.0;
+    public static final double SHOOTER_INTAKE_POWER = 0.99;
+    public static final double SHOOTER_RPM_AT_5FT = 4000.0;
+    public static final double SHOOTER_RPM_AT_10FT = 4000.0;
+    public static final double SHOOTER_RPM_AT_15FT = 4000.0;
+    public static final double SHOOTER_RPM_AT_20FT = 4000.0;
+    public static final double SHOOTER_RPM_AT_25FT = 4000.0;
     public static final double VELOCITY_TOLERANCE_RPM = 150.0;
     public static final double SHOOTER_INTAKE_START_DELAY_SECONDS = 0.5;
 
-    public static final double SHOOTER_KP = 0.00025;
+    public static final double SHOOTER_KP = 1.0;
     public static final double SHOOTER_KI = 0.0;
     public static final double SHOOTER_KD = 0.0;
-    public static final double SHOOTER_KF = 0.00018;
+    public static final double SHOOTER_KF = 0.0;
 
-    public static final double SHOOTER_INTAKE_KP = 0.00025;
+    public static final double SHOOTER_INTAKE_KP = 1.0;
     public static final double SHOOTER_INTAKE_KI = 0.0;
     public static final double SHOOTER_INTAKE_KD = 0.0;
-    public static final double SHOOTER_INTAKE_KF = 0.00018;
+    public static final double SHOOTER_INTAKE_KF = 0.000;
   }
 
   public static final class IntakeConstants
@@ -110,6 +110,6 @@ public final class Constants
     public static final boolean WHEEL_INVERTED = false;
     public static final int CURRENT_LIMIT_AMPS = 40;
     public static final double PIVOT_POWER = 0.30;
-    public static final double WHEEL_POWER = 0.50;
+    public static final double WHEEL_POWER = 0.80;
   }
 }
