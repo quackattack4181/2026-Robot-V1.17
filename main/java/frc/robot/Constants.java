@@ -78,20 +78,20 @@ public final class Constants
 
     public static final boolean SHOOTER_INTAKE_INVERTED = true;
     public static final boolean MIDDLE_SHOOTER_INVERTED = true;
-    public static final boolean TOP_SHOOTER_INVERTED = false;
+    public static final boolean TOP_SHOOTER_INVERTED = true;
 
     public static final int CURRENT_LIMIT_AMPS = 40;
-    public static final double SHOOTER_RPM = 2000.0;
+    public static final double SHOOTER_RPM = 8000.0;
     public static final double SHOOTER_INTAKE_POWER = 0.99;
-    public static final double SHOOTER_RPM_AT_5FT = 4000.0;
-    public static final double SHOOTER_RPM_AT_10FT = 4000.0;
-    public static final double SHOOTER_RPM_AT_15FT = 4000.0;
-    public static final double SHOOTER_RPM_AT_20FT = 4000.0;
-    public static final double SHOOTER_RPM_AT_25FT = 4000.0;
+    public static final double SHOOTER_RPM_AT_5FT = 8000.0;
+    public static final double SHOOTER_RPM_AT_10FT = 8000.0;
+    public static final double SHOOTER_RPM_AT_15FT = 8000.0;
+    public static final double SHOOTER_RPM_AT_20FT = 8000.0;
+    public static final double SHOOTER_RPM_AT_25FT = 8000.0;
     public static final double VELOCITY_TOLERANCE_RPM = 150.0;
-    public static final double SHOOTER_INTAKE_START_DELAY_SECONDS = 0.5;
+    public static final double SHOOTER_INTAKE_START_DELAY_SECONDS = 1;
 
-    public static final double SHOOTER_KP = 1.0;
+    public static final double SHOOTER_KP = 0.00025;
     public static final double SHOOTER_KI = 0.0;
     public static final double SHOOTER_KD = 0.0;
     public static final double SHOOTER_KF = 0.0;
