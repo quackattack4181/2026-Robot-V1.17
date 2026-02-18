@@ -110,7 +110,7 @@ public final class Constants
     public static final boolean WHEEL_INVERTED = false;
     public static final int CURRENT_LIMIT_AMPS = 40;
     public static final double PIVOT_POWER = 0.30;
-    public static final double PIVOT_IN_ANGLE_DEGREES = 50.0;
+    public static final double PIVOT_IN_ANGLE_DEGREES = 20.0;
     public static final double PIVOT_OUT_ANGLE_DEGREES = 154.0;
     public static final double PIVOT_ANGLE_TOLERANCE_DEGREES = 2.0;
     public static final double WHEEL_POWER = 0.80;

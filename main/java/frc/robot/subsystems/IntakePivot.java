@@ -64,31 +64,47 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
   }
 
   public Command runPivotClockwiseToAngle(double targetDegrees) {
+    final double[] lastRemaining = {Double.POSITIVE_INFINITY};
     return runEnd(
         () -> {
           double current = getPivotAngleDegrees();
           double remaining = clockwiseDistanceToTarget(current, targetDegrees);
-          if (remaining > IntakeConstants.PIVOT_ANGLE_TOLERANCE_DEGREES) {
-            setPivotPower(-Math.abs(IntakeConstants.PIVOT_POWER));
-          } else {
+          boolean reachedTarget = remaining <= IntakeConstants.PIVOT_ANGLE_TOLERANCE_DEGREES;
+          boolean passedTarget = remaining > lastRemaining[0];
+
+          if (reachedTarget || passedTarget) {
             stop();
+          } else {
+            setPivotPower(-Math.abs(IntakeConstants.PIVOT_POWER));
+            lastRemaining[0] = remaining;
           }
         },
-        this::stop);
+        () -> {
+          lastRemaining[0] = Double.POSITIVE_INFINITY;
+          stop();
+        });
   }
 
   public Command runPivotCounterClockwiseToAngle(double targetDegrees) {
+    final double[] lastRemaining = {Double.POSITIVE_INFINITY};
     return runEnd(
         () -> {
           double current = getPivotAngleDegrees();
           double remaining = counterClockwiseDistanceToTarget(current, targetDegrees);
-          if (remaining > IntakeConstants.PIVOT_ANGLE_TOLERANCE_DEGREES) {
-            setPivotPower(Math.abs(IntakeConstants.PIVOT_POWER));
-          } else {
+          boolean reachedTarget = remaining <= IntakeConstants.PIVOT_ANGLE_TOLERANCE_DEGREES;
+          boolean passedTarget = remaining > lastRemaining[0];
+
+          if (reachedTarget || passedTarget) {
             stop();
+          } else {
+            setPivotPower(Math.abs(IntakeConstants.PIVOT_POWER));
+            lastRemaining[0] = remaining;
           }
         },
-        this::stop);
+        () -> {
+          lastRemaining[0] = Double.POSITIVE_INFINITY;
+          stop();
+        });
   }
 
   public void setWheelPower(double power) {
