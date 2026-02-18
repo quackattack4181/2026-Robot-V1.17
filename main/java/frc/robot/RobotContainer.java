@@ -15,6 +15,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.IntakeConstants;
@@ -141,8 +142,10 @@ public class RobotContainer {
 
     drivebase.setDefaultCommand(!RobotBase.isSimulation() ? driveFieldOrientedDirectAngle : driveFieldOrientedDirectAngleSim);
 
-    // Spin intake wheels while driverOne holds A
-    driverOne.a().whileTrue(intakePivot.runWheelsPower(IntakeConstants.WHEEL_POWER));
+    // Spin intake wheels while driverOne holds A (no command requirement conflict with pivot control)
+    driverOne.a()
+        .onTrue(Commands.runOnce(() -> intakePivot.setWheelPower(IntakeConstants.WHEEL_POWER)))
+        .onFalse(Commands.runOnce(intakePivot::stopWheels));
 
     driverOne.leftTrigger(0.5)
              .whileTrue(drivebase.driveFieldOrientedWithLimelight(
