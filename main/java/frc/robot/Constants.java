@@ -74,11 +74,9 @@ public final class Constants
   {
     public static final int SHOOTER_INTAKE_MOTOR_ID = 20;
     public static final int MIDDLE_SHOOTER_MOTOR_ID = 21;
-    public static final int TOP_SHOOTER_MOTOR_ID = 22;
 
     public static final boolean SHOOTER_INTAKE_INVERTED = true;
     public static final boolean MIDDLE_SHOOTER_INVERTED = true;
-    public static final boolean TOP_SHOOTER_INVERTED = true;
 
     public static final int CURRENT_LIMIT_AMPS = 40;
     public static final double SHOOTER_RPM = 8000.0;

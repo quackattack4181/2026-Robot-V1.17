@@ -20,17 +20,14 @@ import java.util.function.DoubleSupplier;
 
 public class Shooter extends SubsystemBase implements AutoCloseable {
   private final SparkFlex middleShooterMotor;
-  private final SparkFlex topShooterMotor;
   private final SparkMax shooterIntakeMotor;
 
-  private final RelativeEncoder topShooterEncoder;
+  private final RelativeEncoder middleShooterEncoder;
   private final SparkClosedLoopController middleShooterPid;
-  private final SparkClosedLoopController topShooterPid;
 
   public Shooter() {
     shooterIntakeMotor = new SparkMax(ShooterConstants.SHOOTER_INTAKE_MOTOR_ID, MotorType.kBrushless);
     middleShooterMotor = new SparkFlex(ShooterConstants.MIDDLE_SHOOTER_MOTOR_ID, MotorType.kBrushless);
-    topShooterMotor = new SparkFlex(ShooterConstants.TOP_SHOOTER_MOTOR_ID, MotorType.kBrushless);
 
     SparkMaxConfig intakeConfig = new SparkMaxConfig();
     intakeConfig.idleMode(IdleMode.kCoast);
@@ -49,31 +46,17 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
         ShooterConstants.SHOOTER_KF);
     middleShooterMotor.configure(middleConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    SparkFlexConfig topConfig = new SparkFlexConfig();
-    topConfig.idleMode(IdleMode.kCoast);
-    topConfig.smartCurrentLimit(ShooterConstants.CURRENT_LIMIT_AMPS);
-    topConfig.inverted(ShooterConstants.TOP_SHOOTER_INVERTED);
-    topConfig.closedLoop.pidf(
-        ShooterConstants.SHOOTER_KP,
-        ShooterConstants.SHOOTER_KI,
-        ShooterConstants.SHOOTER_KD,
-        ShooterConstants.SHOOTER_KF);
-    topShooterMotor.configure(topConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-    topShooterEncoder = topShooterMotor.getEncoder();
+    middleShooterEncoder = middleShooterMotor.getEncoder();
     middleShooterPid = middleShooterMotor.getClosedLoopController();
-    topShooterPid = topShooterMotor.getClosedLoopController();
   }
 
   public void stop() {
     shooterIntakeMotor.stopMotor();
     middleShooterMotor.stopMotor();
-    topShooterMotor.stopMotor();
   }
 
   public void setShooterRpm(double rpm) {
     middleShooterPid.setReference(rpm, ControlType.kVelocity);
-    topShooterPid.setReference(rpm, ControlType.kVelocity);
   }
 
   public void setShooterIntakePower(double power) {
@@ -81,7 +64,7 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
   }
 
   public double getShooterRpm() {
-    return topShooterEncoder.getVelocity();
+    return middleShooterEncoder.getVelocity();
   }
 
   public boolean atSpeed() {
@@ -162,6 +145,5 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
   public void close() {
     shooterIntakeMotor.close();
     middleShooterMotor.close();
-    topShooterMotor.close();
   }
 }
