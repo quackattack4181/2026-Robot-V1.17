@@ -62,7 +62,7 @@ public class RobotContainer {
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController driverOne = new CommandXboxController(0);
-  // private final CommandXboxController driverTwo = new CommandXboxController(1);
+  private final CommandXboxController driverTwo = new CommandXboxController(1);
 
 
 
@@ -142,8 +142,10 @@ public class RobotContainer {
 
     drivebase.setDefaultCommand(!RobotBase.isSimulation() ? driveFieldOrientedDirectAngle : driveFieldOrientedDirectAngleSim);
 
-    // Spin intake wheels while driverOne holds A (no command requirement conflict with pivot control)
-    driverOne.a()
+    CommandXboxController intakeController = OperatorConstants.TWO_CONTROLLER_MODE ? driverTwo : driverOne;
+
+    // Intake controls can be assigned to driver one or two via OperatorConstants.TWO_CONTROLLER_MODE
+    intakeController.a()
         .onTrue(Commands.runOnce(() -> intakePivot.setWheelPower(IntakeConstants.WHEEL_POWER)))
         .onFalse(Commands.runOnce(intakePivot::stopWheels));
 
@@ -159,9 +161,9 @@ public class RobotContainer {
                 drivebase.getLimelightTargetDistanceInches(VisionConstants.LIMELIGHT_NAME))));
 
     intakePivot.setDefaultCommand(intakePivot.run(intakePivot::stop));
-    driverOne.povUp().whileTrue(
+    intakeController.povUp().whileTrue(
         intakePivot.runPivotCounterClockwiseToAngle(IntakeConstants.PIVOT_IN_ANGLE_DEGREES));
-    driverOne.povDown().whileTrue(
+    intakeController.povDown().whileTrue(
         intakePivot.runPivotClockwiseToAngle(IntakeConstants.PIVOT_OUT_ANGLE_DEGREES));
 
 
