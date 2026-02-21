@@ -64,16 +64,33 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
     return (targetDegrees - currentDegrees + 360.0) % 360.0;
   }
 
-  private double maxClockwiseTravelWithinRange() {
-    return clockwiseDistanceToTarget(
-        IntakeConstants.PIVOT_IN_ANGLE_DEGREES,
-        IntakeConstants.PIVOT_OUT_ANGLE_DEGREES);
+  private double shortestSignedErrorDegrees(double currentDegrees, double targetDegrees) {
+    return ((targetDegrees - currentDegrees + 540.0) % 360.0) - 180.0;
   }
 
-  private double maxCounterClockwiseTravelWithinRange() {
-    return counterClockwiseDistanceToTarget(
-        IntakeConstants.PIVOT_OUT_ANGLE_DEGREES,
-        IntakeConstants.PIVOT_IN_ANGLE_DEGREES);
+  private boolean isInForbiddenShortArc(double currentDegrees) {
+    return currentDegrees > IntakeConstants.PIVOT_IN_ANGLE_DEGREES
+        && currentDegrees < IntakeConstants.PIVOT_OUT_ANGLE_DEGREES;
+  }
+
+  private boolean isPastOutLimit(double currentDegrees) {
+    if (!isInForbiddenShortArc(currentDegrees)) {
+      return false;
+    }
+
+    double distanceToIn = Math.abs(shortestSignedErrorDegrees(currentDegrees, IntakeConstants.PIVOT_IN_ANGLE_DEGREES));
+    double distanceToOut = Math.abs(shortestSignedErrorDegrees(currentDegrees, IntakeConstants.PIVOT_OUT_ANGLE_DEGREES));
+    return distanceToOut <= distanceToIn;
+  }
+
+  private boolean isPastInLimit(double currentDegrees) {
+    if (!isInForbiddenShortArc(currentDegrees)) {
+      return false;
+    }
+
+    double distanceToIn = Math.abs(shortestSignedErrorDegrees(currentDegrees, IntakeConstants.PIVOT_IN_ANGLE_DEGREES));
+    double distanceToOut = Math.abs(shortestSignedErrorDegrees(currentDegrees, IntakeConstants.PIVOT_OUT_ANGLE_DEGREES));
+    return distanceToIn < distanceToOut;
   }
 
   public Command runPivotClockwiseToAngle(double targetDegrees) {
@@ -84,10 +101,9 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
           double remaining = clockwiseDistanceToTarget(current, targetDegrees);
           boolean reachedTarget = remaining <= IntakeConstants.PIVOT_ANGLE_TOLERANCE_DEGREES;
           boolean passedTarget = remaining > lastRemaining[0];
-          boolean commandDirectionInvalid =
-              remaining > maxClockwiseTravelWithinRange() + IntakeConstants.PIVOT_ANGLE_TOLERANCE_DEGREES;
+          boolean directionBlockedByLimit = isPastOutLimit(current);
 
-          if (reachedTarget || passedTarget || commandDirectionInvalid) {
+          if (reachedTarget || passedTarget || directionBlockedByLimit) {
             stop();
           } else {
             setPivotPower(-Math.abs(IntakeConstants.PIVOT_POWER));
@@ -108,10 +124,9 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
           double remaining = counterClockwiseDistanceToTarget(current, targetDegrees);
           boolean reachedTarget = remaining <= IntakeConstants.PIVOT_ANGLE_TOLERANCE_DEGREES;
           boolean passedTarget = remaining > lastRemaining[0];
-          boolean commandDirectionInvalid =
-              remaining > maxCounterClockwiseTravelWithinRange() + IntakeConstants.PIVOT_ANGLE_TOLERANCE_DEGREES;
+          boolean directionBlockedByLimit = isPastInLimit(current);
 
-          if (reachedTarget || passedTarget || commandDirectionInvalid) {
+          if (reachedTarget || passedTarget || directionBlockedByLimit) {
             stop();
           } else {
             setPivotPower(Math.abs(IntakeConstants.PIVOT_POWER));
