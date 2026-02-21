@@ -110,6 +110,7 @@ public final class Constants
     public static final boolean LEFT_CLIMBER_INVERTED = true;
     public static final boolean RIGHT_CLIMBER_INVERTED = false;
     public static final int CURRENT_LIMIT_AMPS = 40;
+    public static final double MAX_ALLOWED_POWER = 0.80;
     public static final double CLIMBER_POWER = 0.50;
     public static final double POSITION_TOLERANCE_DEGREES = 1.0;
     public static final double POSITION_KP = 0.012;
