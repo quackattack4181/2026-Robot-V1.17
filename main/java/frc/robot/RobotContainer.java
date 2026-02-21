@@ -131,6 +131,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("runShooterFor5Sec", shooter.runShooterForSeconds(
         5.0,
         () -> drivebase.getLimelightTargetDistanceInches(VisionConstants.LIMELIGHT_NAME)));
+    NamedCommands.registerCommand("runPause5", Commands.waitSeconds(5.0));
 
     if (OperatorConstants.CLIMBER_ENABLED && climber != null) {
       NamedCommands.registerCommand("runClimberDown", climber.moveToDown());
