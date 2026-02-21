@@ -134,12 +134,14 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
     return runOnce(() -> setShooterPower(getTargetPowerForDistanceInches(distanceInchesSupplier.getAsDouble())));
   }
 
-  public Command stopShooterCommand() {
-    return runOnce(this::stop);
+  public Command runShooterForSeconds(double seconds, DoubleSupplier distanceInchesSupplier) {
+    return runShooterPower(() -> getTargetPowerForDistanceInches(distanceInchesSupplier.getAsDouble()))
+        .withTimeout(seconds)
+        .andThen(runOnce(this::stop));
   }
 
-  public Command waitOneSecondCommand() {
-    return edu.wpi.first.wpilibj2.command.Commands.waitSeconds(1.0);
+  public Command stopShooterCommand() {
+    return runOnce(this::stop);
   }
 
   @Override

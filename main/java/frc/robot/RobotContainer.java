@@ -108,9 +108,6 @@ public class RobotContainer {
     autoSelectedEntry = elasticTable.getEntry(AUTO_SELECTED_KEY);
     autoOptionsEntry = elasticTable.getEntry(AUTO_OPTIONS_KEY);
 
-    // Auto-discover PathPlanner autos/paths from deploy and publish to Elastic.
-    loadAutoOptions();
-
     NamedCommands.registerCommand("runAlignToTag", drivebase.aimAtLimelightTarget(VisionConstants.LIMELIGHT_NAME));
     NamedCommands.registerCommand("runIntakePivotOut", intakePivot.moveToOutAngleCommand());
     NamedCommands.registerCommand("runIntakePivotIn", intakePivot.moveToInAngleCommand());
@@ -120,7 +117,21 @@ public class RobotContainer {
     NamedCommands.registerCommand("runShooterOn", shooter.spinUpForDistanceCommand(
         () -> drivebase.getLimelightTargetDistanceInches(VisionConstants.LIMELIGHT_NAME)));
     NamedCommands.registerCommand("runShooterOff", shooter.stopShooterCommand());
-    NamedCommands.registerCommand("runWait1Sec", Commands.waitSeconds(1.0));
+    NamedCommands.registerCommand("runShooterFor1Sec", shooter.runShooterForSeconds(
+        1.0,
+        () -> drivebase.getLimelightTargetDistanceInches(VisionConstants.LIMELIGHT_NAME)));
+    NamedCommands.registerCommand("runShooterFor2Sec", shooter.runShooterForSeconds(
+        2.0,
+        () -> drivebase.getLimelightTargetDistanceInches(VisionConstants.LIMELIGHT_NAME)));
+    NamedCommands.registerCommand("runShooterFor3Sec", shooter.runShooterForSeconds(
+        3.0,
+        () -> drivebase.getLimelightTargetDistanceInches(VisionConstants.LIMELIGHT_NAME)));
+    NamedCommands.registerCommand("runShooterFor5Sec", shooter.runShooterForSeconds(
+        5.0,
+        () -> drivebase.getLimelightTargetDistanceInches(VisionConstants.LIMELIGHT_NAME)));
+
+    // Auto-discover PathPlanner autos/paths from deploy and publish to Elastic.
+    loadAutoOptions();
     
   }
 
