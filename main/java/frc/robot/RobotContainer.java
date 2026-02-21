@@ -118,16 +118,16 @@ public class RobotContainer {
     // Auto-discover PathPlanner autos/paths from deploy and publish to Elastic.
     loadAutoOptions(isBlueAlliance);
 
-    NamedCommands.registerCommand("AlignToTag", drivebase.aimAtLimelightTarget(VisionConstants.LIMELIGHT_NAME));
-    NamedCommands.registerCommand("IntakePivotOut", intakePivot.moveToOutAngleCommand());
-    NamedCommands.registerCommand("IntakePivotIn", intakePivot.moveToInAngleCommand());
-    NamedCommands.registerCommand("IntakeWheelsOn", Commands.runOnce(
+    NamedCommands.registerCommand("runAlignToTag", drivebase.aimAtLimelightTarget(VisionConstants.LIMELIGHT_NAME));
+    NamedCommands.registerCommand("runIntakePivotOut", intakePivot.moveToOutAngleCommand());
+    NamedCommands.registerCommand("runIntakePivotIn", intakePivot.moveToInAngleCommand());
+    NamedCommands.registerCommand("runIntakeWheelsOn", Commands.runOnce(
         () -> intakePivot.setWheelPower(IntakeConstants.WHEEL_POWER), intakePivot));
-    NamedCommands.registerCommand("IntakeWheelsOff", intakePivot.stopWheelsCommand());
-    NamedCommands.registerCommand("ShooterOn", shooter.spinUpForDistanceCommand(
+    NamedCommands.registerCommand("runIntakeWheelsOff", intakePivot.stopWheelsCommand());
+    NamedCommands.registerCommand("runShooterOn", shooter.spinUpForDistanceCommand(
         () -> drivebase.getLimelightTargetDistanceInches(VisionConstants.LIMELIGHT_NAME)));
-    NamedCommands.registerCommand("ShooterOff", shooter.stopShooterCommand());
-    NamedCommands.registerCommand("Wait1Sec", Commands.waitSeconds(1.0));
+    NamedCommands.registerCommand("runShooterOff", shooter.stopShooterCommand());
+    NamedCommands.registerCommand("runWait1Sec", Commands.waitSeconds(1.0));
     
   }
 
