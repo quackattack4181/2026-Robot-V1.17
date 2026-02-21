@@ -18,9 +18,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.IntakePivot;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
@@ -59,6 +61,7 @@ public class RobotContainer {
   "swerve/neo"));
   private final Shooter shooter = new Shooter();
   private final IntakePivot intakePivot = new IntakePivot();
+  private final Climber climber = new Climber();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController driverOne = new CommandXboxController(0);
@@ -116,6 +119,15 @@ public class RobotContainer {
     loadAutoOptions(isBlueAlliance);
 
     NamedCommands.registerCommand("AlignToTag", drivebase.aimAtLimelightTarget(VisionConstants.LIMELIGHT_NAME));
+    NamedCommands.registerCommand("IntakePivotOut", intakePivot.moveToOutAngleCommand());
+    NamedCommands.registerCommand("IntakePivotIn", intakePivot.moveToInAngleCommand());
+    NamedCommands.registerCommand("IntakeWheelsOn", Commands.runOnce(
+        () -> intakePivot.setWheelPower(IntakeConstants.WHEEL_POWER), intakePivot));
+    NamedCommands.registerCommand("IntakeWheelsOff", intakePivot.stopWheelsCommand());
+    NamedCommands.registerCommand("ShooterOn", shooter.spinUpForDistanceCommand(
+        () -> drivebase.getLimelightTargetDistanceInches(VisionConstants.LIMELIGHT_NAME)));
+    NamedCommands.registerCommand("ShooterOff", shooter.stopShooterCommand());
+    NamedCommands.registerCommand("Wait1Sec", Commands.waitSeconds(1.0));
     
   }
 
@@ -166,6 +178,9 @@ public class RobotContainer {
     intakeController.povDown().whileTrue(
         intakePivot.runPivotClockwiseToAngle(IntakeConstants.PIVOT_OUT_ANGLE_DEGREES));
 
+    // Climber controls are always on driver one controller.
+    driverOne.x().whileTrue(climber.runClimberPower(ClimberConstants.CLIMBER_POWER));
+    driverOne.y().whileTrue(climber.runClimberPower(-ClimberConstants.CLIMBER_POWER));
 
 
     //========================================

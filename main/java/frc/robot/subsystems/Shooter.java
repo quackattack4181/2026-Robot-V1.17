@@ -130,6 +130,18 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
     return runShooterPower(ShooterConstants.SHOOTER_POWER_AT_10FT);
   }
 
+  public Command spinUpForDistanceCommand(DoubleSupplier distanceInchesSupplier) {
+    return runOnce(() -> setShooterPower(getTargetPowerForDistanceInches(distanceInchesSupplier.getAsDouble())));
+  }
+
+  public Command stopShooterCommand() {
+    return runOnce(this::stop);
+  }
+
+  public Command waitOneSecondCommand() {
+    return edu.wpi.first.wpilibj2.command.Commands.waitSeconds(1.0);
+  }
+
   @Override
   public void close() {
     shooterIntakeMotor.close();

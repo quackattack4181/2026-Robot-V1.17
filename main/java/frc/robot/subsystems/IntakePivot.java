@@ -123,6 +123,31 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
         });
   }
 
+
+  public boolean isNearAngle(double targetDegrees) {
+    double current = getPivotAngleDegrees();
+    double delta = Math.abs(((current - targetDegrees + 540.0) % 360.0) - 180.0);
+    return delta <= IntakeConstants.PIVOT_ANGLE_TOLERANCE_DEGREES;
+  }
+
+  public Command moveToOutAngleCommand() {
+    return runPivotClockwiseToAngle(IntakeConstants.PIVOT_OUT_ANGLE_DEGREES)
+        .until(() -> isNearAngle(IntakeConstants.PIVOT_OUT_ANGLE_DEGREES))
+        .withTimeout(2.5)
+        .andThen(runOnce(this::stop));
+  }
+
+  public Command moveToInAngleCommand() {
+    return runPivotCounterClockwiseToAngle(IntakeConstants.PIVOT_IN_ANGLE_DEGREES)
+        .until(() -> isNearAngle(IntakeConstants.PIVOT_IN_ANGLE_DEGREES))
+        .withTimeout(2.5)
+        .andThen(runOnce(this::stop));
+  }
+
+  public Command stopWheelsCommand() {
+    return runOnce(this::stopWheels);
+  }
+
   public void setWheelPower(double power) {
     wheelMotor.set(power);
   }
