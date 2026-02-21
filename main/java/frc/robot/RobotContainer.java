@@ -156,8 +156,8 @@ public class RobotContainer {
                  VisionConstants.LIMELIGHT_NAME));
 
     driverOne.rightTrigger(0.5).whileTrue(
-        shooter.runShooterRpm(
-            () -> shooter.getTargetRpmForDistanceInches(
+        shooter.runShooterPower(
+            () -> shooter.getTargetPowerForDistanceInches(
                 drivebase.getLimelightTargetDistanceInches(VisionConstants.LIMELIGHT_NAME))));
 
     intakePivot.setDefaultCommand(intakePivot.run(intakePivot::stop));

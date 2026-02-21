@@ -1,10 +1,7 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
@@ -22,8 +19,7 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
   private final SparkFlex middleShooterMotor;
   private final SparkMax shooterIntakeMotor;
 
-  private final RelativeEncoder middleShooterEncoder;
-  private final SparkClosedLoopController middleShooterPid;
+  private double currentShooterPower = 0.0;
 
   public Shooter() {
     shooterIntakeMotor = new SparkMax(ShooterConstants.SHOOTER_INTAKE_MOTOR_ID, MotorType.kBrushless);
@@ -39,59 +35,53 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
     middleConfig.idleMode(IdleMode.kCoast);
     middleConfig.smartCurrentLimit(ShooterConstants.CURRENT_LIMIT_AMPS);
     middleConfig.inverted(ShooterConstants.MIDDLE_SHOOTER_INVERTED);
-    middleConfig.closedLoop.pidf(
-        ShooterConstants.SHOOTER_KP,
-        ShooterConstants.SHOOTER_KI,
-        ShooterConstants.SHOOTER_KD,
-        ShooterConstants.SHOOTER_KF);
     middleShooterMotor.configure(middleConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-    middleShooterEncoder = middleShooterMotor.getEncoder();
-    middleShooterPid = middleShooterMotor.getClosedLoopController();
   }
 
   public void stop() {
     shooterIntakeMotor.stopMotor();
     middleShooterMotor.stopMotor();
+    currentShooterPower = 0.0;
   }
 
-  public void setShooterRpm(double rpm) {
-    middleShooterPid.setReference(rpm, ControlType.kVelocity);
+  public void setShooterPower(double power) {
+    currentShooterPower = MathUtil.clamp(power, -1.0, 1.0);
+    middleShooterMotor.set(currentShooterPower);
   }
 
   public void setShooterIntakePower(double power) {
     shooterIntakeMotor.set(MathUtil.clamp(power, -1.0, 1.0));
   }
 
-  public double getShooterRpm() {
-    return middleShooterEncoder.getVelocity();
+  public double getShooterPower() {
+    return currentShooterPower;
   }
 
-  public boolean atSpeed() {
-    return Math.abs(getShooterRpm() - ShooterConstants.SHOOTER_RPM)
-        <= ShooterConstants.VELOCITY_TOLERANCE_RPM;
+  public boolean atPower() {
+    return Math.abs(getShooterPower() - ShooterConstants.SHOOTER_POWER)
+        <= ShooterConstants.SHOOTER_POWER_TOLERANCE;
   }
 
-  public double getTargetRpmForDistanceInches(double distanceInches) {
+  public double getTargetPowerForDistanceInches(double distanceInches) {
     if (Double.isNaN(distanceInches) || Double.isInfinite(distanceInches)) {
-      return ShooterConstants.SHOOTER_RPM;
+      return ShooterConstants.SHOOTER_POWER;
     }
 
     double distanceFeet = distanceInches / 12.0;
     double[] distancePoints = {5.0, 10.0, 15.0, 20.0, 25.0};
-    double[] rpmPoints = {
-        ShooterConstants.SHOOTER_RPM_AT_5FT,
-        ShooterConstants.SHOOTER_RPM_AT_10FT,
-        ShooterConstants.SHOOTER_RPM_AT_15FT,
-        ShooterConstants.SHOOTER_RPM_AT_20FT,
-        ShooterConstants.SHOOTER_RPM_AT_25FT};
+    double[] powerPoints = {
+        ShooterConstants.SHOOTER_POWER_AT_5FT,
+        ShooterConstants.SHOOTER_POWER_AT_10FT,
+        ShooterConstants.SHOOTER_POWER_AT_15FT,
+        ShooterConstants.SHOOTER_POWER_AT_20FT,
+        ShooterConstants.SHOOTER_POWER_AT_25FT};
 
     if (distanceFeet <= distancePoints[0]) {
-      return rpmPoints[0];
+      return MathUtil.clamp(powerPoints[0], -1.0, 1.0);
     }
 
     if (distanceFeet >= distancePoints[distancePoints.length - 1]) {
-      return rpmPoints[rpmPoints.length - 1];
+      return MathUtil.clamp(powerPoints[powerPoints.length - 1], -1.0, 1.0);
     }
 
     for (int i = 0; i < distancePoints.length - 1; i++) {
@@ -99,22 +89,22 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
       double highDistance = distancePoints[i + 1];
       if (distanceFeet >= lowDistance && distanceFeet <= highDistance) {
         double t = (distanceFeet - lowDistance) / (highDistance - lowDistance);
-        return MathUtil.interpolate(rpmPoints[i], rpmPoints[i + 1], t);
+        return MathUtil.clamp(MathUtil.interpolate(powerPoints[i], powerPoints[i + 1], t), -1.0, 1.0);
       }
     }
 
-    return ShooterConstants.SHOOTER_RPM;
+    return MathUtil.clamp(ShooterConstants.SHOOTER_POWER, -1.0, 1.0);
   }
 
-  public Command runShooterRpm(double shooterRpm) {
-    return runShooterRpm(() -> shooterRpm, () -> ShooterConstants.SHOOTER_INTAKE_POWER);
+  public Command runShooterPower(double shooterPower) {
+    return runShooterPower(() -> shooterPower, () -> ShooterConstants.SHOOTER_INTAKE_POWER);
   }
 
-  public Command runShooterRpm(DoubleSupplier shooterRpmSupplier) {
-    return runShooterRpm(shooterRpmSupplier, () -> ShooterConstants.SHOOTER_INTAKE_POWER);
+  public Command runShooterPower(DoubleSupplier shooterPowerSupplier) {
+    return runShooterPower(shooterPowerSupplier, () -> ShooterConstants.SHOOTER_INTAKE_POWER);
   }
 
-  public Command runShooterRpm(DoubleSupplier shooterRpmSupplier, DoubleSupplier intakePowerSupplier) {
+  public Command runShooterPower(DoubleSupplier shooterPowerSupplier, DoubleSupplier intakePowerSupplier) {
     final double[] startTimestamp = {-1.0};
     return runEnd(
         () -> {
@@ -122,7 +112,7 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
             startTimestamp[0] = Timer.getFPGATimestamp();
           }
 
-          setShooterRpm(shooterRpmSupplier.getAsDouble());
+          setShooterPower(shooterPowerSupplier.getAsDouble());
 
           if (Timer.getFPGATimestamp() - startTimestamp[0]
               >= ShooterConstants.SHOOTER_INTAKE_START_DELAY_SECONDS) {
@@ -137,8 +127,8 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
         });
   }
 
-  public Command runShooterRpm() {
-    return runShooterRpm(ShooterConstants.SHOOTER_RPM);
+  public Command runShooterPower() {
+    return runShooterPower(ShooterConstants.SHOOTER_POWER);
   }
 
   @Override
