@@ -195,6 +195,7 @@ public class RobotContainer {
       driverTwo.y().whileTrue(climber.moveToLevel2());
 
       // Manual override controls for either direction.
+      // Left bumper moves hooks forward; right bumper moves hooks backward.
       driverTwo.leftBumper().whileTrue(climber.runClimberPower(ClimberConstants.CLIMBER_POWER));
       driverTwo.rightBumper().whileTrue(climber.runClimberPower(-ClimberConstants.CLIMBER_POWER));
     }

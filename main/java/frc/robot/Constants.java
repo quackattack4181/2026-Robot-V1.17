@@ -107,8 +107,8 @@ public final class Constants
     public static final int LEFT_CLIMBER_MOTOR_ID = 40;
     public static final int RIGHT_CLIMBER_MOTOR_ID = 41;
     public static final int ABSOLUTE_ENCODER_CHANNEL = 8;
-    public static final boolean LEFT_CLIMBER_INVERTED = false;
-    public static final boolean RIGHT_CLIMBER_INVERTED = true;
+    public static final boolean LEFT_CLIMBER_INVERTED = true;
+    public static final boolean RIGHT_CLIMBER_INVERTED = false;
     public static final int CURRENT_LIMIT_AMPS = 40;
     public static final double CLIMBER_POWER = 0.50;
     public static final double POSITION_HOLD_POWER = 0.40;
