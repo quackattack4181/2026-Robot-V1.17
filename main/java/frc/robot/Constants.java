@@ -116,8 +116,12 @@ public final class Constants
 
     // Update these after measuring real climber angles on robot.
     public static final double HOME_ANGLE_DEGREES = 20.0;
-    public static final double LEVEL1_ANGLE_DEGREES = 110.0;
-    public static final double LEVEL2_ANGLE_DEGREES = 200.0;
+    public static final double LEVEL_ONE_ANGLE_DEGREES = 110.0;
+    public static final double LEVEL_TWO_ANGLE_DEGREES = 200.0;
+
+    // Backward-compatible aliases.
+    public static final double LEVEL1_ANGLE_DEGREES = LEVEL_ONE_ANGLE_DEGREES;
+    public static final double LEVEL2_ANGLE_DEGREES = LEVEL_TWO_ANGLE_DEGREES;
   }
 
   public static final class IntakeConstants

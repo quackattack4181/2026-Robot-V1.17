@@ -130,6 +130,12 @@ public class RobotContainer {
         5.0,
         () -> drivebase.getLimelightTargetDistanceInches(VisionConstants.LIMELIGHT_NAME)));
 
+    if (OperatorConstants.CLIMBER_ENABLED && climber != null) {
+      NamedCommands.registerCommand("runClimberHome", climber.moveToHome());
+      NamedCommands.registerCommand("runClimberLevel1", climber.moveToLevel1());
+      NamedCommands.registerCommand("runClimberLevel2", climber.moveToLevel2());
+    }
+
     // Auto-discover PathPlanner autos/paths from deploy and publish to Elastic.
     loadAutoOptions();
     

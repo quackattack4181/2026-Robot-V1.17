@@ -74,11 +74,11 @@ public class Climber extends SubsystemBase implements AutoCloseable {
   }
 
   public Command moveToLevel1() {
-    return moveToAngle(ClimberConstants.LEVEL1_ANGLE_DEGREES);
+    return moveToAngle(ClimberConstants.LEVEL_ONE_ANGLE_DEGREES);
   }
 
   public Command moveToLevel2() {
-    return moveToAngle(ClimberConstants.LEVEL2_ANGLE_DEGREES);
+    return moveToAngle(ClimberConstants.LEVEL_TWO_ANGLE_DEGREES);
   }
 
   public Command runClimberPower(double power) {
