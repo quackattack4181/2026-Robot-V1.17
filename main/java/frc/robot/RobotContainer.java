@@ -114,7 +114,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("runIntakeWheelsOn", Commands.runOnce(
         () -> intakePivot.setWheelPower(IntakeConstants.WHEEL_POWER), intakePivot));
     NamedCommands.registerCommand("runIntakeWheelsOff", intakePivot.stopWheelsCommand());
-    NamedCommands.registerCommand("runShooterOn", shooter.spinUpForDistanceCommand(
+    NamedCommands.registerCommand("runShooterOn", shooter.runShooterForSeconds(
+        5.0,
         () -> drivebase.getLimelightTargetDistanceInches(VisionConstants.LIMELIGHT_NAME)));
     NamedCommands.registerCommand("runShooterOff", shooter.stopShooterCommand());
     NamedCommands.registerCommand("runShooterFor1Sec", shooter.runShooterForSeconds(
