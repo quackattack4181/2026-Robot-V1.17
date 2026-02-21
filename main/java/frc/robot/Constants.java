@@ -114,6 +114,7 @@ public final class Constants
     public static final double POSITION_TOLERANCE_DEGREES = 1.0;
     public static final double POSITION_KP = 0.012;
     public static final double POSITION_MAX_POWER = 0.35;
+    public static final double POSITION_MIN_MOVING_POWER = 0.08;
 
     // Current tuned climber positions in degrees.
     public static final double DOWN_ANGLE_DEGREES = 32.0;

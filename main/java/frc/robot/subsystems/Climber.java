@@ -62,9 +62,16 @@ public class Climber extends SubsystemBase implements AutoCloseable {
       return 0.0;
     }
 
-    return Math.max(-ClimberConstants.POSITION_MAX_POWER,
-                    Math.min(ClimberConstants.POSITION_MAX_POWER,
-                             error * ClimberConstants.POSITION_KP));
+    double proportionalPower = error * ClimberConstants.POSITION_KP;
+    double clampedPower = Math.max(-ClimberConstants.POSITION_MAX_POWER,
+                                   Math.min(ClimberConstants.POSITION_MAX_POWER,
+                                            proportionalPower));
+
+    if (Math.abs(clampedPower) < ClimberConstants.POSITION_MIN_MOVING_POWER) {
+      clampedPower = Math.copySign(ClimberConstants.POSITION_MIN_MOVING_POWER, clampedPower);
+    }
+
+    return clampedPower;
   }
 
   public Command holdAtAngle(double targetDegrees) {
