@@ -35,7 +35,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 // import edu.wpi.first.wpilibj2.command.InstantCommand;
 // import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -109,14 +108,8 @@ public class RobotContainer {
     autoSelectedEntry = elasticTable.getEntry(AUTO_SELECTED_KEY);
     autoOptionsEntry = elasticTable.getEntry(AUTO_OPTIONS_KEY);
 
-    boolean isBlueAlliance = false;
-
-    // boolean isBlueAlliance = DriverStation.getAlliance()
-    //         .map(alliance -> alliance == DriverStation.Alliance.Blue)
-    //         .orElse(false); // Default to Red if unknown
-
     // Auto-discover PathPlanner autos/paths from deploy and publish to Elastic.
-    loadAutoOptions(isBlueAlliance);
+    loadAutoOptions();
 
     NamedCommands.registerCommand("runAlignToTag", drivebase.aimAtLimelightTarget(VisionConstants.LIMELIGHT_NAME));
     NamedCommands.registerCommand("runIntakePivotOut", intakePivot.moveToOutAngleCommand());
@@ -189,7 +182,7 @@ public class RobotContainer {
 
   }
 
-  private void loadAutoOptions(boolean isBlueAlliance) {
+  private void loadAutoOptions() {
     autoOptions.clear();
 
     Path pathplannerDir = Filesystem.getDeployDirectory().toPath().resolve("pathplanner");
@@ -201,7 +194,7 @@ public class RobotContainer {
         files.forEach(path -> {
           String fileName = path.getFileName().toString();
           String autoName = fileName.substring(0, fileName.length() - 5);
-          autoOptions.put(autoName, new PathPlannerAuto(autoName, isBlueAlliance));
+          autoOptions.put(autoName, AutoBuilder.buildAuto(autoName));
         });
       } catch (IOException e) {
         System.err.println("Failed to read PathPlanner autos: " + e.getMessage());
