@@ -81,17 +81,17 @@ public final class Constants
 
     public static final int CURRENT_LIMIT_AMPS = 40;
     public static final double SHOOTER_INTAKE_POWER = 0.99;
-    public static final double SHOOTER_POWER_AT_5FT = 1.00;
-    public static final double SHOOTER_POWER_AT_10FT = 0.50;
-    public static final double SHOOTER_POWER_AT_15FT = 1.00;
-    public static final double SHOOTER_POWER_AT_20FT = 1.00;
+    public static final double SHOOTER_POWER_AT_5FT = 0.35;
+    public static final double SHOOTER_POWER_AT_10FT = 0.55;
+    public static final double SHOOTER_POWER_AT_15FT = 0.80;
+    public static final double SHOOTER_POWER_AT_20FT = 0.95;
     public static final double SHOOTER_POWER_TOLERANCE = 0.02;
     public static final double SHOOTER_INTAKE_START_DELAY_SECONDS = 1;
 
-    public static final double SHOOTER_KP = 0.00025;
+    public static final double SHOOTER_KP = 0.00003;
     public static final double SHOOTER_KI = 0.0;
-    public static final double SHOOTER_KD = 0.0;
-    public static final double SHOOTER_KF = 0.0;
+    public static final double SHOOTER_KD = 0.0001;
+    public static final double SHOOTER_KF = 0.00025;
 
     public static final double SHOOTER_INTAKE_KP = 1.0;
     public static final double SHOOTER_INTAKE_KI = 0.0;
