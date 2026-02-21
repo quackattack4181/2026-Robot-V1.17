@@ -134,6 +134,7 @@ public class Robot extends TimedRobot
       CommandScheduler.getInstance().cancelAll();
     }
     m_robotContainer.setDriveMode();
+    m_robotContainer.zeroDriverHeading();
     m_robotContainer.setMotorBrake(true);
   }
 

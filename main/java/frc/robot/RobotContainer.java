@@ -185,8 +185,8 @@ public class RobotContainer {
             () -> shooter.getTargetPowerForDistanceInches(
                 drivebase.getLimelightTargetDistanceInches(VisionConstants.LIMELIGHT_NAME))));
 
-    // Driver one gyro reset.
-    driverOne.start().onTrue(Commands.runOnce(drivebase::zeroGyroWithAlliance));
+    // Driver one manual gyro zero: current facing becomes forward.
+    driverOne.start().onTrue(Commands.runOnce(drivebase::zeroGyro));
 
     intakePivot.setDefaultCommand(intakePivot.run(intakePivot::stop));
     intakeController.povUp().whileTrue(
@@ -212,6 +212,10 @@ public class RobotContainer {
     //        Driver Two Controls #2
     //========================================
 
+  }
+
+  public void zeroDriverHeading() {
+    drivebase.zeroGyro();
   }
 
   private void loadAutoOptions() {
