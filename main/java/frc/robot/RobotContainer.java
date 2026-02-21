@@ -166,8 +166,8 @@ public class RobotContainer {
 
     CommandXboxController intakeController = OperatorConstants.TWO_CONTROLLER_MODE ? driverTwo : driverOne;
 
-    // Intake controls can be assigned to driver one or two via OperatorConstants.TWO_CONTROLLER_MODE
-    intakeController.a()
+    // Intake wheel controls can be assigned to driver one or two via OperatorConstants.TWO_CONTROLLER_MODE.
+    intakeController.rightTrigger(0.5)
         .onTrue(Commands.runOnce(() -> intakePivot.setWheelPower(IntakeConstants.WHEEL_POWER)))
         .onFalse(Commands.runOnce(intakePivot::stopWheels));
 
@@ -190,13 +190,10 @@ public class RobotContainer {
 
     if (OperatorConstants.CLIMBER_ENABLED && climber != null) {
       // Climber controls are on driver two only.
-      // Hold-to-run behavior: releasing the button stops motion.
-      driverTwo.a().whileTrue(climber.moveToDown());
-      driverTwo.x().whileTrue(climber.moveToLevel1());
-      driverTwo.y().whileTrue(climber.moveToLevel2());
-
-      // Lock climber at current position while B is held.
-      driverTwo.b().whileTrue(climber.lockAtCurrentPosition());
+      // A/X/Y are press-to-target commands that continue to hold that target angle until interrupted.
+      driverTwo.a().onTrue(climber.moveToDown());
+      driverTwo.x().onTrue(climber.moveToLevel1());
+      driverTwo.y().onTrue(climber.moveToLevel2());
 
       // Manual override controls for either direction.
       // Left bumper moves hooks forward (angle increases); right bumper moves hooks backward (angle decreases).

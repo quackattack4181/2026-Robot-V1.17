@@ -67,14 +67,20 @@ public class Climber extends SubsystemBase implements AutoCloseable {
                              error * ClimberConstants.POSITION_KP));
   }
 
+  public Command holdAtAngle(double targetDegrees) {
+    return run(() -> setClimberPower(getPositionHoldPower(targetDegrees)));
+  }
+
   public Command moveToAngle(double targetDegrees) {
-    return runEnd(
-        () -> setClimberPower(getPositionHoldPower(targetDegrees)),
-        this::stop);
+    return holdAtAngle(targetDegrees);
+  }
+
+  public Command moveToAndHold(double targetDegrees) {
+    return holdAtAngle(targetDegrees);
   }
 
   public Command moveToDown() {
-    return moveToAngle(ClimberConstants.DOWN_ANGLE_DEGREES);
+    return moveToAndHold(ClimberConstants.DOWN_ANGLE_DEGREES);
   }
 
   public Command moveToHome() {
@@ -82,11 +88,11 @@ public class Climber extends SubsystemBase implements AutoCloseable {
   }
 
   public Command moveToLevel1() {
-    return moveToAngle(ClimberConstants.LEVEL_ONE_ANGLE_DEGREES);
+    return moveToAndHold(ClimberConstants.LEVEL_ONE_ANGLE_DEGREES);
   }
 
   public Command moveToLevel2() {
-    return moveToAngle(ClimberConstants.LEVEL_TWO_ANGLE_DEGREES);
+    return moveToAndHold(ClimberConstants.LEVEL_TWO_ANGLE_DEGREES);
   }
 
   public Command lockAtCurrentPosition() {
