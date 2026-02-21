@@ -481,6 +481,29 @@ public class SwerveSubsystem extends SubsystemBase
     return isAllowedAimTagId(tagId);
   }
 
+  private double getAverageTxForAllowedTags(String limelightName)
+  {
+    LimelightHelpers.RawFiducial[] fiducials = LimelightHelpers.getRawFiducials(limelightName);
+    double txSum = 0.0;
+    int allowedCount = 0;
+
+    for (LimelightHelpers.RawFiducial fiducial : fiducials)
+    {
+      if (isAllowedAimTagId(fiducial.id))
+      {
+        txSum += fiducial.txnc;
+        allowedCount++;
+      }
+    }
+
+    if (allowedCount > 0)
+    {
+      return txSum / allowedCount;
+    }
+
+    return hasAllowedLimelightTarget(limelightName) ? LimelightHelpers.getTX(limelightName) : Double.NaN;
+  }
+
   /**
    * Command to drive field-relative while using Limelight AprilTag targeting to control rotation.
    *
@@ -498,7 +521,11 @@ public class SwerveSubsystem extends SubsystemBase
       double omega = 0.0;
       if (hasAllowedLimelightTarget(limelightName))
       {
-        double tx = LimelightHelpers.getTX(limelightName);
+        double tx = getAverageTxForAllowedTags(limelightName);
+        if (!Double.isFinite(tx))
+        {
+          tx = 0.0;
+        }
         omega = limelightAimController.calculate(tx, 0.0);
         omega = MathUtil.clamp(omega, -Constants.VisionConstants.AIM_MAX_ANGULAR_VELOCITY_RAD_PER_SEC,
                                Constants.VisionConstants.AIM_MAX_ANGULAR_VELOCITY_RAD_PER_SEC);
@@ -524,14 +551,18 @@ public class SwerveSubsystem extends SubsystemBase
       double omega = 0.0;
       if (hasAllowedLimelightTarget(limelightName))
       {
-        double tx = LimelightHelpers.getTX(limelightName);
+        double tx = getAverageTxForAllowedTags(limelightName);
+        if (!Double.isFinite(tx))
+        {
+          tx = 0.0;
+        }
         omega = limelightAimController.calculate(tx, 0.0);
         omega = MathUtil.clamp(omega, -Constants.VisionConstants.AIM_MAX_ANGULAR_VELOCITY_RAD_PER_SEC,
                                Constants.VisionConstants.AIM_MAX_ANGULAR_VELOCITY_RAD_PER_SEC);
       }
       drive(new Translation2d(0.0, 0.0), omega, true);
     }).until(() -> hasAllowedLimelightTarget(limelightName)
-                && Math.abs(LimelightHelpers.getTX(limelightName))
+                && Math.abs(getAverageTxForAllowedTags(limelightName))
                    < Constants.VisionConstants.AIM_TOLERANCE_DEGREES);
   }
 
@@ -697,7 +728,7 @@ public class SwerveSubsystem extends SubsystemBase
   public boolean isLimelightAligned(String limelightName)
   {
     return hasAllowedLimelightTarget(limelightName)
-           && Math.abs(LimelightHelpers.getTX(limelightName))
+           && Math.abs(getAverageTxForAllowedTags(limelightName))
               < Constants.VisionConstants.AIM_TOLERANCE_DEGREES;
   }
 
@@ -712,6 +743,24 @@ public class SwerveSubsystem extends SubsystemBase
     if (!hasAllowedLimelightTarget(limelightName))
     {
       return Double.NaN;
+    }
+
+    LimelightHelpers.RawFiducial[] fiducials = LimelightHelpers.getRawFiducials(limelightName);
+    double distanceSumMeters = 0.0;
+    int allowedCount = 0;
+
+    for (LimelightHelpers.RawFiducial fiducial : fiducials)
+    {
+      if (isAllowedAimTagId(fiducial.id) && fiducial.distToRobot > 1e-6)
+      {
+        distanceSumMeters += fiducial.distToRobot;
+        allowedCount++;
+      }
+    }
+
+    if (allowedCount > 0)
+    {
+      return distanceSumMeters / allowedCount;
     }
 
     Pose3d targetPoseCameraSpace = LimelightHelpers.getTargetPose3d_CameraSpace(limelightName);

@@ -61,7 +61,7 @@ public final class Constants
     public static final double AIM_KD = 0.002;
     public static final double AIM_TOLERANCE_DEGREES = 0.5;
     public static final double AIM_MAX_ANGULAR_VELOCITY_RAD_PER_SEC = 4.0;
-    public static final int[] ALLOWED_AIM_TAG_IDS = {10, 26};
+    public static final int[] ALLOWED_AIM_TAG_IDS = {2, 8, 10, 24, 26};
     // Linear calibration for Limelight distance inches: calibrated = raw * scale + offset.
     // Defaults fit two tape-measure points: (raw 68.0 -> true 68.0), (raw 103.5 -> true 105.0).
     public static final double LIMELIGHT_DISTANCE_SCALE = 1.0422535;
@@ -106,10 +106,18 @@ public final class Constants
   {
     public static final int LEFT_CLIMBER_MOTOR_ID = 40;
     public static final int RIGHT_CLIMBER_MOTOR_ID = 41;
+    public static final int ABSOLUTE_ENCODER_CHANNEL = 8;
     public static final boolean LEFT_CLIMBER_INVERTED = false;
     public static final boolean RIGHT_CLIMBER_INVERTED = true;
     public static final int CURRENT_LIMIT_AMPS = 40;
     public static final double CLIMBER_POWER = 0.50;
+    public static final double POSITION_HOLD_POWER = 0.40;
+    public static final double POSITION_TOLERANCE_DEGREES = 3.0;
+
+    // Update these after measuring real climber angles on robot.
+    public static final double HOME_ANGLE_DEGREES = 20.0;
+    public static final double LEVEL1_ANGLE_DEGREES = 110.0;
+    public static final double LEVEL2_ANGLE_DEGREES = 200.0;
   }
 
   public static final class IntakeConstants

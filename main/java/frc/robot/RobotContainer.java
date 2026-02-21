@@ -183,9 +183,14 @@ public class RobotContainer {
         intakePivot.runPivotClockwiseToAngle(IntakeConstants.PIVOT_OUT_ANGLE_DEGREES));
 
     if (OperatorConstants.CLIMBER_ENABLED && climber != null) {
-      // Climber controls are always on driver one controller when climber is enabled.
-      driverOne.x().whileTrue(climber.runClimberPower(ClimberConstants.CLIMBER_POWER));
-      driverOne.y().whileTrue(climber.runClimberPower(-ClimberConstants.CLIMBER_POWER));
+      // Climber controls are on driver two only.
+      driverTwo.a().whileTrue(climber.moveToHome());
+      driverTwo.x().whileTrue(climber.moveToLevel1());
+      driverTwo.y().whileTrue(climber.moveToLevel2());
+
+      // Manual override controls for either direction.
+      driverTwo.leftBumper().whileTrue(climber.runClimberPower(ClimberConstants.CLIMBER_POWER));
+      driverTwo.rightBumper().whileTrue(climber.runClimberPower(-ClimberConstants.CLIMBER_POWER));
     }
 
 

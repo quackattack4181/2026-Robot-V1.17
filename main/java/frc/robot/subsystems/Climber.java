@@ -6,6 +6,9 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ClimberConstants;
@@ -13,10 +16,14 @@ import frc.robot.Constants.ClimberConstants;
 public class Climber extends SubsystemBase implements AutoCloseable {
   private final SparkMax leftClimberMotor;
   private final SparkMax rightClimberMotor;
+  private final DutyCycleEncoder absoluteEncoder;
+  private final NetworkTableEntry climberAngleDegreesEntry =
+      NetworkTableInstance.getDefault().getTable("Elastic").getEntry("Climber Angle (deg)");
 
   public Climber() {
     leftClimberMotor = new SparkMax(ClimberConstants.LEFT_CLIMBER_MOTOR_ID, MotorType.kBrushless);
     rightClimberMotor = new SparkMax(ClimberConstants.RIGHT_CLIMBER_MOTOR_ID, MotorType.kBrushless);
+    absoluteEncoder = new DutyCycleEncoder(ClimberConstants.ABSOLUTE_ENCODER_CHANNEL);
 
     SparkMaxConfig leftConfig = new SparkMaxConfig();
     leftConfig.idleMode(IdleMode.kBrake);
@@ -41,13 +48,54 @@ public class Climber extends SubsystemBase implements AutoCloseable {
     rightClimberMotor.stopMotor();
   }
 
+  public double getClimberAngleDegrees() {
+    return absoluteEncoder.get() * 360.0;
+  }
+
+  private double shortestSignedErrorDegrees(double currentDegrees, double targetDegrees) {
+    return ((targetDegrees - currentDegrees + 540.0) % 360.0) - 180.0;
+  }
+
+  public Command moveToAngle(double targetDegrees) {
+    return runEnd(
+        () -> {
+          double error = shortestSignedErrorDegrees(getClimberAngleDegrees(), targetDegrees);
+          if (Math.abs(error) <= ClimberConstants.POSITION_TOLERANCE_DEGREES) {
+            stop();
+          } else {
+            setClimberPower(Math.copySign(ClimberConstants.POSITION_HOLD_POWER, error));
+          }
+        },
+        this::stop);
+  }
+
+  public Command moveToHome() {
+    return moveToAngle(ClimberConstants.HOME_ANGLE_DEGREES);
+  }
+
+  public Command moveToLevel1() {
+    return moveToAngle(ClimberConstants.LEVEL1_ANGLE_DEGREES);
+  }
+
+  public Command moveToLevel2() {
+    return moveToAngle(ClimberConstants.LEVEL2_ANGLE_DEGREES);
+  }
+
   public Command runClimberPower(double power) {
     return startEnd(() -> setClimberPower(power), this::stop);
+  }
+
+  @Override
+  public void periodic() {
+    if (absoluteEncoder.isConnected()) {
+      climberAngleDegreesEntry.setDouble(getClimberAngleDegrees());
+    }
   }
 
   @Override
   public void close() {
     leftClimberMotor.close();
     rightClimberMotor.close();
+    absoluteEncoder.close();
   }
 }
