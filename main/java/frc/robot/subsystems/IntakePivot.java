@@ -6,8 +6,9 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
@@ -16,13 +17,13 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
   private final SparkMax pivotMotor;
   private final SparkMax wheelMotor;
   private final DutyCycleEncoder pivotEncoder;
-  private double lastPrintTime;
+  private final NetworkTableEntry pivotAngleDegreesEntry =
+      NetworkTableInstance.getDefault().getTable("Elastic").getEntry("Intake Pivot Angle (deg)");
 
   public IntakePivot() {
     pivotMotor = new SparkMax(IntakeConstants.PIVOT_MOTOR_ID, MotorType.kBrushless);
     wheelMotor = new SparkMax(IntakeConstants.WHEEL_MOTOR_ID, MotorType.kBrushless);
     pivotEncoder = new DutyCycleEncoder(9);
-    lastPrintTime = 0.0;
 
     SparkMaxConfig pivotConfig = new SparkMaxConfig();
     pivotConfig.idleMode(IdleMode.kBrake);
@@ -166,16 +167,8 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void periodic() {
-    double now = Timer.getFPGATimestamp();
-    if (now - lastPrintTime >= 0.25) {
-      double dutyCycle = pivotEncoder.get();
-      if (pivotEncoder.isConnected()) {
-        double degrees = getPivotAngleDegrees();
-        System.out.printf("Intake pivot angle: %.2f degrees%n", degrees);
-      } else {
-        System.out.printf("Intake pivot encoder not connected (duty cycle=%.3f)%n", dutyCycle);
-      }
-      lastPrintTime = now;
+    if (pivotEncoder.isConnected()) {
+      pivotAngleDegreesEntry.setDouble(getPivotAngleDegrees());
     }
   }
 
