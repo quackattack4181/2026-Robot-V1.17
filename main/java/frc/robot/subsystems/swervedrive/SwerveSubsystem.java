@@ -143,6 +143,8 @@ public class SwerveSubsystem extends SubsystemBase
     }
     setupPathPlanner();
     limelightAimController.setTolerance(Constants.VisionConstants.AIM_TOLERANCE_DEGREES);
+    LimelightHelpers.SetFiducialIDFiltersOverride(Constants.VisionConstants.LIMELIGHT_NAME,
+                                                  Constants.VisionConstants.ALLOWED_AIM_TAG_IDS);
   }
 
   /**
@@ -156,6 +158,8 @@ public class SwerveSubsystem extends SubsystemBase
     // swerveDrive = new SwerveDrive(driveCfg, controllerCfg, Constants.MAX_SPEED);
     swerveDrive = new SwerveDrive(driveCfg, controllerCfg, Constants.MAX_SPEED, null); // *HERE*
     limelightAimController.setTolerance(Constants.VisionConstants.AIM_TOLERANCE_DEGREES);
+    LimelightHelpers.SetFiducialIDFiltersOverride(Constants.VisionConstants.LIMELIGHT_NAME,
+                                                  Constants.VisionConstants.ALLOWED_AIM_TAG_IDS);
   }
 
   /**
@@ -454,6 +458,29 @@ public class SwerveSubsystem extends SubsystemBase
     });
   }
 
+  private boolean isAllowedAimTagId(int tagId)
+  {
+    for (int allowedId : Constants.VisionConstants.ALLOWED_AIM_TAG_IDS)
+    {
+      if (allowedId == tagId)
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean hasAllowedLimelightTarget(String limelightName)
+  {
+    if (!LimelightHelpers.getTV(limelightName))
+    {
+      return false;
+    }
+
+    int tagId = (int) Math.round(LimelightHelpers.getFiducialID(limelightName));
+    return isAllowedAimTagId(tagId);
+  }
+
   /**
    * Command to drive field-relative while using Limelight AprilTag targeting to control rotation.
    *
@@ -469,7 +496,7 @@ public class SwerveSubsystem extends SubsystemBase
       Translation2d scaledInputs = SwerveMath.scaleTranslation(new Translation2d(translationX.getAsDouble(),
                                                                                  translationY.getAsDouble()), 0.8);
       double omega = 0.0;
-      if (LimelightHelpers.getTV(limelightName))
+      if (hasAllowedLimelightTarget(limelightName))
       {
         double tx = LimelightHelpers.getTX(limelightName);
         omega = limelightAimController.calculate(tx, 0.0);
@@ -495,7 +522,7 @@ public class SwerveSubsystem extends SubsystemBase
   {
     return run(() -> {
       double omega = 0.0;
-      if (LimelightHelpers.getTV(limelightName))
+      if (hasAllowedLimelightTarget(limelightName))
       {
         double tx = LimelightHelpers.getTX(limelightName);
         omega = limelightAimController.calculate(tx, 0.0);
@@ -503,7 +530,7 @@ public class SwerveSubsystem extends SubsystemBase
                                Constants.VisionConstants.AIM_MAX_ANGULAR_VELOCITY_RAD_PER_SEC);
       }
       drive(new Translation2d(0.0, 0.0), omega, true);
-    }).until(() -> LimelightHelpers.getTV(limelightName)
+    }).until(() -> hasAllowedLimelightTarget(limelightName)
                 && Math.abs(LimelightHelpers.getTX(limelightName))
                    < Constants.VisionConstants.AIM_TOLERANCE_DEGREES);
   }
@@ -669,7 +696,7 @@ public class SwerveSubsystem extends SubsystemBase
    */
   public boolean isLimelightAligned(String limelightName)
   {
-    return LimelightHelpers.getTV(limelightName)
+    return hasAllowedLimelightTarget(limelightName)
            && Math.abs(LimelightHelpers.getTX(limelightName))
               < Constants.VisionConstants.AIM_TOLERANCE_DEGREES;
   }
@@ -682,7 +709,7 @@ public class SwerveSubsystem extends SubsystemBase
    */
   public double getLimelightTargetDistanceMeters(String limelightName)
   {
-    if (!LimelightHelpers.getTV(limelightName))
+    if (!hasAllowedLimelightTarget(limelightName))
     {
       return Double.NaN;
     }
