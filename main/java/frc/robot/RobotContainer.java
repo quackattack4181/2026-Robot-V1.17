@@ -111,9 +111,10 @@ public class RobotContainer {
     NamedCommands.registerCommand("runAlignToTag", drivebase.aimAtLimelightTarget(VisionConstants.LIMELIGHT_NAME));
     NamedCommands.registerCommand("runIntakePivotOut", intakePivot.moveToOutAngleCommand());
     NamedCommands.registerCommand("runIntakePivotIn", intakePivot.moveToInAngleCommand());
+    // Intentionally no subsystem requirements here so PathPlanner can parallel this with pivot movement.
     NamedCommands.registerCommand("runIntakeWheelsOn", Commands.runOnce(
-        () -> intakePivot.setWheelPower(IntakeConstants.WHEEL_POWER), intakePivot));
-    NamedCommands.registerCommand("runIntakeWheelsOff", intakePivot.stopWheelsCommand());
+        () -> intakePivot.setWheelPower(IntakeConstants.WHEEL_POWER)));
+    NamedCommands.registerCommand("runIntakeWheelsOff", Commands.runOnce(intakePivot::stopWheels));
     NamedCommands.registerCommand("runShooterOn", shooter.runShooterForSeconds(
         5.0,
         () -> drivebase.getLimelightTargetDistanceInches(VisionConstants.LIMELIGHT_NAME)));
