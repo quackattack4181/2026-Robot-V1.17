@@ -58,23 +58,22 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
   }
 
   public boolean atPower() {
-    return Math.abs(getShooterPower() - ShooterConstants.SHOOTER_POWER)
+    return Math.abs(getShooterPower() - ShooterConstants.SHOOTER_POWER_AT_10FT)
         <= ShooterConstants.SHOOTER_POWER_TOLERANCE;
   }
 
   public double getTargetPowerForDistanceInches(double distanceInches) {
     if (Double.isNaN(distanceInches) || Double.isInfinite(distanceInches)) {
-      return ShooterConstants.SHOOTER_POWER;
+      return ShooterConstants.SHOOTER_POWER_AT_10FT;
     }
 
     double distanceFeet = distanceInches / 12.0;
-    double[] distancePoints = {5.0, 10.0, 15.0, 20.0, 25.0};
+    double[] distancePoints = {5.0, 10.0, 15.0, 20.0};
     double[] powerPoints = {
         ShooterConstants.SHOOTER_POWER_AT_5FT,
         ShooterConstants.SHOOTER_POWER_AT_10FT,
         ShooterConstants.SHOOTER_POWER_AT_15FT,
-        ShooterConstants.SHOOTER_POWER_AT_20FT,
-        ShooterConstants.SHOOTER_POWER_AT_25FT};
+        ShooterConstants.SHOOTER_POWER_AT_20FT};
 
     if (distanceFeet <= distancePoints[0]) {
       return MathUtil.clamp(powerPoints[0], -1.0, 1.0);
@@ -93,7 +92,7 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
       }
     }
 
-    return MathUtil.clamp(ShooterConstants.SHOOTER_POWER, -1.0, 1.0);
+    return MathUtil.clamp(ShooterConstants.SHOOTER_POWER_AT_10FT, -1.0, 1.0);
   }
 
   public Command runShooterPower(double shooterPower) {
@@ -128,7 +127,7 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
   }
 
   public Command runShooterPower() {
-    return runShooterPower(ShooterConstants.SHOOTER_POWER);
+    return runShooterPower(ShooterConstants.SHOOTER_POWER_AT_10FT);
   }
 
   @Override

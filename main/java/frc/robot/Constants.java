@@ -80,13 +80,11 @@ public final class Constants
     public static final boolean MIDDLE_SHOOTER_INVERTED = true;
 
     public static final int CURRENT_LIMIT_AMPS = 40;
-    public static final double SHOOTER_POWER = 1.00;
     public static final double SHOOTER_INTAKE_POWER = 0.99;
     public static final double SHOOTER_POWER_AT_5FT = 1.00;
-    public static final double SHOOTER_POWER_AT_10FT = 1.00;
+    public static final double SHOOTER_POWER_AT_10FT = 0.50;
     public static final double SHOOTER_POWER_AT_15FT = 1.00;
     public static final double SHOOTER_POWER_AT_20FT = 1.00;
-    public static final double SHOOTER_POWER_AT_25FT = 1.00;
     public static final double SHOOTER_POWER_TOLERANCE = 0.02;
     public static final double SHOOTER_INTAKE_START_DELAY_SECONDS = 1;
 
