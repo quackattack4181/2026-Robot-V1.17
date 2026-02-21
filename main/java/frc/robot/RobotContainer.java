@@ -60,7 +60,7 @@ public class RobotContainer {
   "swerve/neo"));
   private final Shooter shooter = new Shooter();
   private final IntakePivot intakePivot = new IntakePivot();
-  private final Climber climber = new Climber();
+  private final Climber climber = OperatorConstants.CLIMBER_ENABLED ? new Climber() : null;
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController driverOne = new CommandXboxController(0);
@@ -182,9 +182,11 @@ public class RobotContainer {
     intakeController.povDown().whileTrue(
         intakePivot.runPivotClockwiseToAngle(IntakeConstants.PIVOT_OUT_ANGLE_DEGREES));
 
-    // Climber controls are always on driver one controller.
-    driverOne.x().whileTrue(climber.runClimberPower(ClimberConstants.CLIMBER_POWER));
-    driverOne.y().whileTrue(climber.runClimberPower(-ClimberConstants.CLIMBER_POWER));
+    if (OperatorConstants.CLIMBER_ENABLED && climber != null) {
+      // Climber controls are always on driver one controller when climber is enabled.
+      driverOne.x().whileTrue(climber.runClimberPower(ClimberConstants.CLIMBER_POWER));
+      driverOne.y().whileTrue(climber.runClimberPower(-ClimberConstants.CLIMBER_POWER));
+    }
 
 
     //========================================
