@@ -85,6 +85,15 @@ public class SwerveSubsystem extends SubsystemBase
    */
   private final NetworkTableEntry limelightDistanceInchesEntry =
       NetworkTableInstance.getDefault().getTable("Elastic").getEntry("Limelight Distance (in)");
+  /**
+   * Legacy entry kept for dashboard compatibility with older Elastic layouts.
+   */
+  private final NetworkTableEntry limelightDistanceFeetEntry =
+      NetworkTableInstance.getDefault().getTable("Elastic").getEntry("Limelight Distance (ft)");
+  /**
+   * Last valid Limelight distance to avoid publishing NaN and blanking dashboard widgets.
+   */
+  private double lastValidLimelightDistanceInches = 0.0;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -166,8 +175,14 @@ public class SwerveSubsystem extends SubsystemBase
       swerveDrive.updateOdometry();
       // vision.updatePoseEstimation(swerveDrive);
     }
-    limelightDistanceInchesEntry.setDouble(
-        getLimelightTargetDistanceInches(Constants.VisionConstants.LIMELIGHT_NAME));
+    double limelightDistanceInches = getLimelightTargetDistanceInches(Constants.VisionConstants.LIMELIGHT_NAME);
+    if (Double.isFinite(limelightDistanceInches))
+    {
+      lastValidLimelightDistanceInches = limelightDistanceInches;
+    }
+
+    limelightDistanceInchesEntry.setDouble(lastValidLimelightDistanceInches);
+    limelightDistanceFeetEntry.setDouble(lastValidLimelightDistanceInches / 12.0);
   }
 
   @Override
