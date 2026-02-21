@@ -41,6 +41,12 @@ public class Climber extends SubsystemBase implements AutoCloseable {
   public void setClimberPower(double power) {
     double clampedPower = Math.max(-ClimberConstants.MAX_ALLOWED_POWER,
                                     Math.min(ClimberConstants.MAX_ALLOWED_POWER, power));
+
+    double currentAngle = getClimberAngleDegrees();
+    if (clampedPower > 0.0 && currentAngle >= ClimberConstants.MAX_FORWARD_ANGLE_DEGREES) {
+      clampedPower = 0.0;
+    }
+
     leftClimberMotor.set(clampedPower);
     rightClimberMotor.set(clampedPower);
   }
