@@ -131,7 +131,7 @@ public class RobotContainer {
         () -> drivebase.getLimelightTargetDistanceInches(VisionConstants.LIMELIGHT_NAME)));
 
     if (OperatorConstants.CLIMBER_ENABLED && climber != null) {
-      NamedCommands.registerCommand("runClimberHome", climber.moveToHome());
+      NamedCommands.registerCommand("runClimberDown", climber.moveToDown());
       NamedCommands.registerCommand("runClimberLevel1", climber.moveToLevel1());
       NamedCommands.registerCommand("runClimberLevel2", climber.moveToLevel2());
     }
@@ -190,12 +190,16 @@ public class RobotContainer {
 
     if (OperatorConstants.CLIMBER_ENABLED && climber != null) {
       // Climber controls are on driver two only.
-      driverTwo.a().whileTrue(climber.moveToHome());
+      // Hold-to-run behavior: releasing the button stops motion.
+      driverTwo.a().whileTrue(climber.moveToDown());
       driverTwo.x().whileTrue(climber.moveToLevel1());
       driverTwo.y().whileTrue(climber.moveToLevel2());
 
+      // Lock climber at current position while B is held.
+      driverTwo.b().whileTrue(climber.lockAtCurrentPosition());
+
       // Manual override controls for either direction.
-      // Left bumper moves hooks forward; right bumper moves hooks backward.
+      // Left bumper moves hooks forward (angle increases); right bumper moves hooks backward (angle decreases).
       driverTwo.leftBumper().whileTrue(climber.runClimberPower(ClimberConstants.CLIMBER_POWER));
       driverTwo.rightBumper().whileTrue(climber.runClimberPower(-ClimberConstants.CLIMBER_POWER));
     }

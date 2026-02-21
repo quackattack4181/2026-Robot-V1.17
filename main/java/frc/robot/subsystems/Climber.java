@@ -56,21 +56,29 @@ public class Climber extends SubsystemBase implements AutoCloseable {
     return ((targetDegrees - currentDegrees + 540.0) % 360.0) - 180.0;
   }
 
+  private double getPositionHoldPower(double targetDegrees) {
+    double error = shortestSignedErrorDegrees(getClimberAngleDegrees(), targetDegrees);
+    if (Math.abs(error) <= ClimberConstants.POSITION_TOLERANCE_DEGREES) {
+      return 0.0;
+    }
+
+    return Math.max(-ClimberConstants.POSITION_MAX_POWER,
+                    Math.min(ClimberConstants.POSITION_MAX_POWER,
+                             error * ClimberConstants.POSITION_KP));
+  }
+
   public Command moveToAngle(double targetDegrees) {
     return runEnd(
-        () -> {
-          double error = shortestSignedErrorDegrees(getClimberAngleDegrees(), targetDegrees);
-          if (Math.abs(error) <= ClimberConstants.POSITION_TOLERANCE_DEGREES) {
-            stop();
-          } else {
-            setClimberPower(Math.copySign(ClimberConstants.POSITION_HOLD_POWER, error));
-          }
-        },
+        () -> setClimberPower(getPositionHoldPower(targetDegrees)),
         this::stop);
   }
 
+  public Command moveToDown() {
+    return moveToAngle(ClimberConstants.DOWN_ANGLE_DEGREES);
+  }
+
   public Command moveToHome() {
-    return moveToAngle(ClimberConstants.HOME_ANGLE_DEGREES);
+    return moveToDown();
   }
 
   public Command moveToLevel1() {
@@ -79,6 +87,21 @@ public class Climber extends SubsystemBase implements AutoCloseable {
 
   public Command moveToLevel2() {
     return moveToAngle(ClimberConstants.LEVEL_TWO_ANGLE_DEGREES);
+  }
+
+  public Command lockAtCurrentPosition() {
+    final double[] lockAngleDegrees = {Double.NaN};
+    return runEnd(
+        () -> {
+          if (Double.isNaN(lockAngleDegrees[0])) {
+            lockAngleDegrees[0] = getClimberAngleDegrees();
+          }
+          setClimberPower(getPositionHoldPower(lockAngleDegrees[0]));
+        },
+        () -> {
+          lockAngleDegrees[0] = Double.NaN;
+          stop();
+        });
   }
 
   public Command runClimberPower(double power) {

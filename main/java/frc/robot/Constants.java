@@ -111,15 +111,17 @@ public final class Constants
     public static final boolean RIGHT_CLIMBER_INVERTED = false;
     public static final int CURRENT_LIMIT_AMPS = 40;
     public static final double CLIMBER_POWER = 0.50;
-    public static final double POSITION_HOLD_POWER = 0.40;
     public static final double POSITION_TOLERANCE_DEGREES = 3.0;
+    public static final double POSITION_KP = 0.012;
+    public static final double POSITION_MAX_POWER = 0.35;
 
-    // Update these after measuring real climber angles on robot.
-    public static final double HOME_ANGLE_DEGREES = 20.0;
-    public static final double LEVEL_ONE_ANGLE_DEGREES = 110.0;
-    public static final double LEVEL_TWO_ANGLE_DEGREES = 200.0;
+    // Current tuned climber positions in degrees.
+    public static final double DOWN_ANGLE_DEGREES = 32.0;
+    public static final double LEVEL_ONE_ANGLE_DEGREES = 123.0;
+    public static final double LEVEL_TWO_ANGLE_DEGREES = 123.0;
 
     // Backward-compatible aliases.
+    public static final double HOME_ANGLE_DEGREES = DOWN_ANGLE_DEGREES;
     public static final double LEVEL1_ANGLE_DEGREES = LEVEL_ONE_ANGLE_DEGREES;
     public static final double LEVEL2_ANGLE_DEGREES = LEVEL_TWO_ANGLE_DEGREES;
   }
