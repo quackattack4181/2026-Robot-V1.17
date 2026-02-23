@@ -18,12 +18,18 @@ import java.util.function.DoubleSupplier;
 public class Shooter extends SubsystemBase implements AutoCloseable {
   private final SparkFlex middleShooterMotor;
   private final SparkMax shooterIntakeMotor;
+  private final SparkMax agitatorMotorOne;
+  private final SparkMax agitatorMotorTwo;
+  private final SparkMax agitatorMotorThree;
 
   private double currentShooterPower = 0.0;
 
   public Shooter() {
     shooterIntakeMotor = new SparkMax(ShooterConstants.SHOOTER_INTAKE_MOTOR_ID, MotorType.kBrushless);
     middleShooterMotor = new SparkFlex(ShooterConstants.MIDDLE_SHOOTER_MOTOR_ID, MotorType.kBrushless);
+    agitatorMotorOne = new SparkMax(ShooterConstants.AGITATOR_MOTOR_ONE_ID, MotorType.kBrushless);
+    agitatorMotorTwo = new SparkMax(ShooterConstants.AGITATOR_MOTOR_TWO_ID, MotorType.kBrushless);
+    agitatorMotorThree = new SparkMax(ShooterConstants.AGITATOR_MOTOR_THREE_ID, MotorType.kBrushless);
 
     SparkMaxConfig intakeConfig = new SparkMaxConfig();
     intakeConfig.idleMode(IdleMode.kCoast);
@@ -36,11 +42,32 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
     middleConfig.smartCurrentLimit(ShooterConstants.CURRENT_LIMIT_AMPS);
     middleConfig.inverted(ShooterConstants.MIDDLE_SHOOTER_INVERTED);
     middleShooterMotor.configure(middleConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    SparkMaxConfig agitatorOneConfig = new SparkMaxConfig();
+    agitatorOneConfig.idleMode(IdleMode.kCoast);
+    agitatorOneConfig.smartCurrentLimit(ShooterConstants.CURRENT_LIMIT_AMPS);
+    agitatorOneConfig.inverted(ShooterConstants.AGITATOR_MOTOR_ONE_INVERTED);
+    agitatorMotorOne.configure(agitatorOneConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    SparkMaxConfig agitatorTwoConfig = new SparkMaxConfig();
+    agitatorTwoConfig.idleMode(IdleMode.kCoast);
+    agitatorTwoConfig.smartCurrentLimit(ShooterConstants.CURRENT_LIMIT_AMPS);
+    agitatorTwoConfig.inverted(ShooterConstants.AGITATOR_MOTOR_TWO_INVERTED);
+    agitatorMotorTwo.configure(agitatorTwoConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    SparkMaxConfig agitatorThreeConfig = new SparkMaxConfig();
+    agitatorThreeConfig.idleMode(IdleMode.kCoast);
+    agitatorThreeConfig.smartCurrentLimit(ShooterConstants.CURRENT_LIMIT_AMPS);
+    agitatorThreeConfig.inverted(ShooterConstants.AGITATOR_MOTOR_THREE_INVERTED);
+    agitatorMotorThree.configure(agitatorThreeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   public void stop() {
     shooterIntakeMotor.stopMotor();
     middleShooterMotor.stopMotor();
+    agitatorMotorOne.stopMotor();
+    agitatorMotorTwo.stopMotor();
+    agitatorMotorThree.stopMotor();
     currentShooterPower = 0.0;
   }
 
@@ -51,6 +78,13 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
 
   public void setShooterIntakePower(double power) {
     shooterIntakeMotor.set(MathUtil.clamp(power, -1.0, 1.0));
+  }
+
+  public void setAgitatorPower(double power) {
+    double clampedPower = MathUtil.clamp(power, -1.0, 1.0);
+    agitatorMotorOne.set(clampedPower);
+    agitatorMotorTwo.set(clampedPower);
+    agitatorMotorThree.set(clampedPower);
   }
 
   public double getShooterPower() {
@@ -112,6 +146,7 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
           }
 
           setShooterPower(shooterPowerSupplier.getAsDouble());
+          setAgitatorPower(ShooterConstants.AGITATOR_POWER);
 
           if (Timer.getFPGATimestamp() - startTimestamp[0]
               >= ShooterConstants.SHOOTER_INTAKE_START_DELAY_SECONDS) {
@@ -131,7 +166,10 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
   }
 
   public Command spinUpForDistanceCommand(DoubleSupplier distanceInchesSupplier) {
-    return runOnce(() -> setShooterPower(getTargetPowerForDistanceInches(distanceInchesSupplier.getAsDouble())));
+    return runOnce(() -> {
+      setShooterPower(getTargetPowerForDistanceInches(distanceInchesSupplier.getAsDouble()));
+      setAgitatorPower(ShooterConstants.AGITATOR_POWER);
+    });
   }
 
   public Command runShooterForSeconds(double seconds, DoubleSupplier distanceInchesSupplier) {
@@ -148,5 +186,8 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
   public void close() {
     shooterIntakeMotor.close();
     middleShooterMotor.close();
+    agitatorMotorOne.close();
+    agitatorMotorTwo.close();
+    agitatorMotorThree.close();
   }
 }
