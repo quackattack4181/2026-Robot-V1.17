@@ -81,6 +81,13 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
   }
 
   public void setAgitatorPower(double power) {
+    if (!ShooterConstants.AGITATOR_ENABLED) {
+      agitatorMotorOne.stopMotor();
+      agitatorMotorTwo.stopMotor();
+      agitatorMotorThree.stopMotor();
+      return;
+    }
+
     double clampedPower = MathUtil.clamp(power, -1.0, 1.0);
     agitatorMotorOne.set(clampedPower);
     agitatorMotorTwo.set(clampedPower);

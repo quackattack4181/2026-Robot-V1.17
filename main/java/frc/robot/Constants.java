@@ -101,6 +101,7 @@ public final class Constants
     public static final boolean AGITATOR_MOTOR_ONE_INVERTED = false;
     public static final boolean AGITATOR_MOTOR_TWO_INVERTED = false;
     public static final boolean AGITATOR_MOTOR_THREE_INVERTED = false;
+    public static final boolean AGITATOR_ENABLED = true;
     public static final double AGITATOR_POWER = 1.0;
 
     public static final double SHOOTER_INTAKE_KP = 1.0;
