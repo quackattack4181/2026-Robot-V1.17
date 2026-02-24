@@ -3,9 +3,9 @@ package frc.robot.subsystems;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
@@ -14,24 +14,24 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ClimberConstants;
 
 public class Climber extends SubsystemBase implements AutoCloseable {
-  private final SparkMax leftClimberMotor;
-  private final SparkMax rightClimberMotor;
+  private final SparkFlex leftClimberMotor;
+  private final SparkFlex rightClimberMotor;
   private final DutyCycleEncoder absoluteEncoder;
   private final NetworkTableEntry climberAngleDegreesEntry =
       NetworkTableInstance.getDefault().getTable("Elastic").getEntry("Climber Angle (deg)");
 
   public Climber() {
-    leftClimberMotor = new SparkMax(ClimberConstants.LEFT_CLIMBER_MOTOR_ID, MotorType.kBrushless);
-    rightClimberMotor = new SparkMax(ClimberConstants.RIGHT_CLIMBER_MOTOR_ID, MotorType.kBrushless);
+    leftClimberMotor = new SparkFlex(ClimberConstants.LEFT_CLIMBER_MOTOR_ID, MotorType.kBrushless);
+    rightClimberMotor = new SparkFlex(ClimberConstants.RIGHT_CLIMBER_MOTOR_ID, MotorType.kBrushless);
     absoluteEncoder = new DutyCycleEncoder(ClimberConstants.ABSOLUTE_ENCODER_CHANNEL);
 
-    SparkMaxConfig leftConfig = new SparkMaxConfig();
+    SparkFlexConfig leftConfig = new SparkFlexConfig();
     leftConfig.idleMode(IdleMode.kBrake);
     leftConfig.smartCurrentLimit(ClimberConstants.CURRENT_LIMIT_AMPS);
     leftConfig.inverted(ClimberConstants.LEFT_CLIMBER_INVERTED);
     leftClimberMotor.configure(leftConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    SparkMaxConfig rightConfig = new SparkMaxConfig();
+    SparkFlexConfig rightConfig = new SparkFlexConfig();
     rightConfig.idleMode(IdleMode.kBrake);
     rightConfig.smartCurrentLimit(ClimberConstants.CURRENT_LIMIT_AMPS);
     rightConfig.inverted(ClimberConstants.RIGHT_CLIMBER_INVERTED);

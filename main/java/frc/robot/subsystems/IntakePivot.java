@@ -3,8 +3,10 @@ package frc.robot.subsystems;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -15,14 +17,14 @@ import frc.robot.Constants.IntakeConstants;
 
 public class IntakePivot extends SubsystemBase implements AutoCloseable {
   private final SparkMax pivotMotor;
-  private final SparkMax wheelMotor;
+  private final SparkFlex wheelMotor;
   private final DutyCycleEncoder pivotEncoder;
   private final NetworkTableEntry pivotAngleDegreesEntry =
       NetworkTableInstance.getDefault().getTable("Elastic").getEntry("Intake Pivot Angle (deg)");
 
   public IntakePivot() {
     pivotMotor = new SparkMax(IntakeConstants.PIVOT_MOTOR_ID, MotorType.kBrushless);
-    wheelMotor = new SparkMax(IntakeConstants.WHEEL_MOTOR_ID, MotorType.kBrushless);
+    wheelMotor = new SparkFlex(IntakeConstants.WHEEL_MOTOR_ID, MotorType.kBrushless);
     pivotEncoder = new DutyCycleEncoder(9);
 
     SparkMaxConfig pivotConfig = new SparkMaxConfig();
@@ -31,7 +33,7 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
     pivotConfig.inverted(IntakeConstants.PIVOT_INVERTED);
     pivotMotor.configure(pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    SparkMaxConfig wheelConfig = new SparkMaxConfig();
+    SparkFlexConfig wheelConfig = new SparkFlexConfig();
     wheelConfig.idleMode(IdleMode.kBrake);
     wheelConfig.smartCurrentLimit(IntakeConstants.CURRENT_LIMIT_AMPS);
     wheelConfig.inverted(IntakeConstants.WHEEL_INVERTED);
