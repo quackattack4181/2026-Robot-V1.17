@@ -187,8 +187,12 @@ public class RobotContainer {
                 drivebase.getLimelightTargetDistanceInches(VisionConstants.LIMELIGHT_NAME))));
 
     // Driver one agitator test controls.
-    driverOne.leftBumper().whileTrue(shooter.runAgitatorPower(ShooterConstants.AGITATOR_POWER));
-    driverOne.rightBumper().whileTrue(shooter.runAgitatorPower(-ShooterConstants.AGITATOR_POWER));
+    driverOne.leftBumper()
+        .onTrue(Commands.runOnce(() -> shooter.setAgitatorPower(ShooterConstants.AGITATOR_POWER)))
+        .onFalse(Commands.runOnce(() -> shooter.setAgitatorPower(0.0)));
+    driverOne.rightBumper()
+        .onTrue(Commands.runOnce(() -> shooter.setAgitatorPower(-ShooterConstants.AGITATOR_POWER)))
+        .onFalse(Commands.runOnce(() -> shooter.setAgitatorPower(0.0)));
 
     // Driver one manual gyro zero: current facing becomes forward.
     driverOne.start().onTrue(Commands.runOnce(drivebase::zeroGyro));
