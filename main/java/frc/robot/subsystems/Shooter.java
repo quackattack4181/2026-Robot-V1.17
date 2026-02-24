@@ -142,6 +142,10 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
     return MathUtil.clamp(ShooterConstants.SHOOTER_POWER_AT_10FT, -1.0, 1.0);
   }
 
+  public Command runAgitatorPower(double power) {
+    return startEnd(() -> setAgitatorPower(power), () -> setAgitatorPower(0.0));
+  }
+
   public Command runShooterPower(double shooterPower) {
     return runShooterPower(() -> shooterPower, () -> ShooterConstants.SHOOTER_INTAKE_POWER);
   }

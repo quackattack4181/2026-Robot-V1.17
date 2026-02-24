@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.IntakePivot;
@@ -184,6 +185,10 @@ public class RobotContainer {
         shooter.runShooterPower(
             () -> shooter.getTargetPowerForDistanceInches(
                 drivebase.getLimelightTargetDistanceInches(VisionConstants.LIMELIGHT_NAME))));
+
+    // Driver one agitator test controls.
+    driverOne.leftBumper().whileTrue(shooter.runAgitatorPower(ShooterConstants.AGITATOR_POWER));
+    driverOne.rightBumper().whileTrue(shooter.runAgitatorPower(-ShooterConstants.AGITATOR_POWER));
 
     // Driver one manual gyro zero: current facing becomes forward.
     driverOne.start().onTrue(Commands.runOnce(drivebase::zeroGyro));
