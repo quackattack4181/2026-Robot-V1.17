@@ -186,11 +186,17 @@ public class RobotContainer {
             () -> shooter.getTargetPowerForDistanceInches(
                 drivebase.getLimelightTargetDistanceInches(VisionConstants.LIMELIGHT_NAME))));
 
-    // Driver one agitator test controls.
+    // Driver one agitator test controls (redundant mappings for troubleshooting).
     driverOne.leftBumper()
         .onTrue(Commands.runOnce(() -> shooter.setAgitatorPower(ShooterConstants.AGITATOR_POWER)))
         .onFalse(Commands.runOnce(() -> shooter.setAgitatorPower(0.0)));
     driverOne.rightBumper()
+        .onTrue(Commands.runOnce(() -> shooter.setAgitatorPower(-ShooterConstants.AGITATOR_POWER)))
+        .onFalse(Commands.runOnce(() -> shooter.setAgitatorPower(0.0)));
+    driverOne.a()
+        .onTrue(Commands.runOnce(() -> shooter.setAgitatorPower(ShooterConstants.AGITATOR_POWER)))
+        .onFalse(Commands.runOnce(() -> shooter.setAgitatorPower(0.0)));
+    driverOne.b()
         .onTrue(Commands.runOnce(() -> shooter.setAgitatorPower(-ShooterConstants.AGITATOR_POWER)))
         .onFalse(Commands.runOnce(() -> shooter.setAgitatorPower(0.0)));
 
