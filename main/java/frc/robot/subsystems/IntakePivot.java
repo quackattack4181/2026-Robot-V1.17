@@ -12,8 +12,10 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
+import java.util.Set;
 
 public class IntakePivot extends SubsystemBase implements AutoCloseable {
   private final SparkMax pivotMotor;
@@ -180,6 +182,33 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
 
   public Command runWheelsPower() {
     return runWheelsPower(IntakeConstants.WHEEL_POWER);
+  }
+
+  private double normalizeAngleDegrees(double angleDegrees) {
+    return ((angleDegrees % 360.0) + 360.0) % 360.0;
+  }
+
+  public Command runPivotAgitation(double swingDegrees, double wheelPower) {
+    return Commands.defer(
+        () -> {
+          double centerAngle = getPivotAngleDegrees();
+          double inTarget = normalizeAngleDegrees(centerAngle - Math.abs(swingDegrees));
+          double outTarget = normalizeAngleDegrees(centerAngle + Math.abs(swingDegrees));
+
+          Command oscillate = Commands.sequence(
+              runPivotCounterClockwiseToAngle(inTarget).withTimeout(1.5),
+              runPivotClockwiseToAngle(outTarget).withTimeout(1.5))
+              .repeatedly();
+
+          Command spinWheels = Commands.run(() -> setWheelPower(wheelPower));
+
+          return Commands.deadline(oscillate, spinWheels)
+              .finallyDo(() -> {
+                stopWheels();
+                stop();
+              });
+        },
+        Set.of(this));
   }
 
   @Override

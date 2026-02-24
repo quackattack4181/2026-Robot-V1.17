@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.IntakePivot;
@@ -186,20 +185,6 @@ public class RobotContainer {
             () -> shooter.getTargetPowerForDistanceInches(
                 drivebase.getLimelightTargetDistanceInches(VisionConstants.LIMELIGHT_NAME))));
 
-    // Driver one agitator test controls (redundant mappings for troubleshooting).
-    driverOne.leftBumper()
-        .onTrue(Commands.runOnce(() -> shooter.setAgitatorPower(ShooterConstants.AGITATOR_POWER)))
-        .onFalse(Commands.runOnce(() -> shooter.setAgitatorPower(0.0)));
-    driverOne.rightBumper()
-        .onTrue(Commands.runOnce(() -> shooter.setAgitatorPower(-ShooterConstants.AGITATOR_POWER)))
-        .onFalse(Commands.runOnce(() -> shooter.setAgitatorPower(0.0)));
-    driverOne.a()
-        .onTrue(Commands.runOnce(() -> shooter.setAgitatorPower(ShooterConstants.AGITATOR_POWER)))
-        .onFalse(Commands.runOnce(() -> shooter.setAgitatorPower(0.0)));
-    driverOne.b()
-        .onTrue(Commands.runOnce(() -> shooter.setAgitatorPower(-ShooterConstants.AGITATOR_POWER)))
-        .onFalse(Commands.runOnce(() -> shooter.setAgitatorPower(0.0)));
-
     // Driver one manual gyro zero: current facing becomes forward.
     driverOne.start().onTrue(Commands.runOnce(drivebase::zeroGyro));
 
@@ -208,6 +193,9 @@ public class RobotContainer {
         intakePivot.runPivotCounterClockwiseToAngle(IntakeConstants.PIVOT_IN_ANGLE_DEGREES));
     intakeController.povDown().whileTrue(
         intakePivot.runPivotClockwiseToAngle(IntakeConstants.PIVOT_OUT_ANGLE_DEGREES));
+
+    // Driver two pivot agitation: hold Back to spin intake wheels and oscillate pivot +/-30 degrees.
+    driverTwo.back().whileTrue(intakePivot.runPivotAgitation(30.0, IntakeConstants.WHEEL_POWER));
 
     if (OperatorConstants.CLIMBER_ENABLED && climber != null) {
       // Climber controls are on driver two only.
