@@ -74,6 +74,12 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
   public void setShooterPower(double power) {
     currentShooterPower = MathUtil.clamp(power, -1.0, 1.0);
     middleShooterMotor.set(currentShooterPower);
+
+    if (Math.abs(currentShooterPower) > 1e-3) {
+      setAgitatorPower(ShooterConstants.AGITATOR_POWER);
+    } else {
+      setAgitatorPower(0.0);
+    }
   }
 
   public void setShooterIntakePower(double power) {
@@ -153,7 +159,6 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
           }
 
           setShooterPower(shooterPowerSupplier.getAsDouble());
-          setAgitatorPower(ShooterConstants.AGITATOR_POWER);
 
           if (Timer.getFPGATimestamp() - startTimestamp[0]
               >= ShooterConstants.SHOOTER_INTAKE_START_DELAY_SECONDS) {
@@ -173,10 +178,7 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
   }
 
   public Command spinUpForDistanceCommand(DoubleSupplier distanceInchesSupplier) {
-    return runOnce(() -> {
-      setShooterPower(getTargetPowerForDistanceInches(distanceInchesSupplier.getAsDouble()));
-      setAgitatorPower(ShooterConstants.AGITATOR_POWER);
-    });
+    return runOnce(() -> setShooterPower(getTargetPowerForDistanceInches(distanceInchesSupplier.getAsDouble())));
   }
 
   public Command runShooterForSeconds(double seconds, DoubleSupplier distanceInchesSupplier) {
