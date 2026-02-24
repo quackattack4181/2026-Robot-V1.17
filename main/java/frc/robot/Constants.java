@@ -97,10 +97,8 @@ public final class Constants
 
     public static final int AGITATOR_MOTOR_ONE_ID = 25;
     public static final int AGITATOR_MOTOR_TWO_ID = 26;
-    public static final int AGITATOR_MOTOR_THREE_ID = 27;
     public static final boolean AGITATOR_MOTOR_ONE_INVERTED = false;
     public static final boolean AGITATOR_MOTOR_TWO_INVERTED = false;
-    public static final boolean AGITATOR_MOTOR_THREE_INVERTED = false;
     public static final boolean AGITATOR_ENABLED = true;
     public static final double AGITATOR_POWER = 1.0;
 

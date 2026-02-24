@@ -20,7 +20,6 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
   private final SparkMax shooterIntakeMotor;
   private final SparkMax agitatorMotorOne;
   private final SparkMax agitatorMotorTwo;
-  private final SparkMax agitatorMotorThree;
 
   private double currentShooterPower = 0.0;
 
@@ -29,7 +28,6 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
     middleShooterMotor = new SparkFlex(ShooterConstants.MIDDLE_SHOOTER_MOTOR_ID, MotorType.kBrushless);
     agitatorMotorOne = new SparkMax(ShooterConstants.AGITATOR_MOTOR_ONE_ID, MotorType.kBrushless);
     agitatorMotorTwo = new SparkMax(ShooterConstants.AGITATOR_MOTOR_TWO_ID, MotorType.kBrushless);
-    agitatorMotorThree = new SparkMax(ShooterConstants.AGITATOR_MOTOR_THREE_ID, MotorType.kBrushless);
 
     SparkMaxConfig intakeConfig = new SparkMaxConfig();
     intakeConfig.idleMode(IdleMode.kCoast);
@@ -55,11 +53,6 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
     agitatorTwoConfig.inverted(ShooterConstants.AGITATOR_MOTOR_TWO_INVERTED);
     agitatorMotorTwo.configure(agitatorTwoConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    SparkMaxConfig agitatorThreeConfig = new SparkMaxConfig();
-    agitatorThreeConfig.idleMode(IdleMode.kCoast);
-    agitatorThreeConfig.smartCurrentLimit(ShooterConstants.CURRENT_LIMIT_AMPS);
-    agitatorThreeConfig.inverted(ShooterConstants.AGITATOR_MOTOR_THREE_INVERTED);
-    agitatorMotorThree.configure(agitatorThreeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   public void stop() {
@@ -67,7 +60,6 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
     middleShooterMotor.stopMotor();
     agitatorMotorOne.stopMotor();
     agitatorMotorTwo.stopMotor();
-    agitatorMotorThree.stopMotor();
     currentShooterPower = 0.0;
   }
 
@@ -90,14 +82,12 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
     if (!ShooterConstants.AGITATOR_ENABLED) {
       agitatorMotorOne.stopMotor();
       agitatorMotorTwo.stopMotor();
-      agitatorMotorThree.stopMotor();
-      return;
+        return;
     }
 
     double clampedPower = MathUtil.clamp(power, -1.0, 1.0);
     agitatorMotorOne.set(clampedPower);
     agitatorMotorTwo.set(clampedPower);
-    agitatorMotorThree.set(clampedPower);
   }
 
   public double getShooterPower() {
@@ -201,6 +191,5 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
     middleShooterMotor.close();
     agitatorMotorOne.close();
     agitatorMotorTwo.close();
-    agitatorMotorThree.close();
   }
 }
