@@ -101,7 +101,7 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
 
   public double getTargetPowerForDistanceInches(double distanceInches) {
     if (Double.isNaN(distanceInches) || Double.isInfinite(distanceInches)) {
-      return ShooterConstants.SHOOTER_POWER_AT_10FT;
+      return ShooterConstants.SHOOTER_POWER_NO_TAG_DEFAULT;
     }
 
     double distanceFeet = distanceInches / 12.0;
@@ -129,7 +129,7 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
       }
     }
 
-    return MathUtil.clamp(ShooterConstants.SHOOTER_POWER_AT_10FT, -1.0, 1.0);
+    return MathUtil.clamp(ShooterConstants.SHOOTER_POWER_NO_TAG_DEFAULT, -1.0, 1.0);
   }
 
   public Command runAgitatorPower(double power) {

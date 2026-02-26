@@ -470,6 +470,30 @@ public class SwerveSubsystem extends SubsystemBase
     return false;
   }
 
+  private boolean isDirectAimTagId(int tagId)
+  {
+    for (int directId : Constants.VisionConstants.DIRECT_AIM_TAG_IDS)
+    {
+      if (directId == tagId)
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean isCenterAimTagId(int tagId)
+  {
+    for (int centerId : Constants.VisionConstants.CENTER_AIM_TAG_IDS)
+    {
+      if (centerId == tagId)
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
   private boolean hasAllowedLimelightTarget(String limelightName)
   {
     if (!LimelightHelpers.getTV(limelightName))
@@ -484,21 +508,42 @@ public class SwerveSubsystem extends SubsystemBase
   private double getAverageTxForAllowedTags(String limelightName)
   {
     LimelightHelpers.RawFiducial[] fiducials = LimelightHelpers.getRawFiducials(limelightName);
-    double txSum = 0.0;
-    int allowedCount = 0;
+
+    double centerTxSum = 0.0;
+    int centerCount = 0;
+    double directTxSum = 0.0;
+    int directCount = 0;
 
     for (LimelightHelpers.RawFiducial fiducial : fiducials)
     {
-      if (isAllowedAimTagId(fiducial.id))
+      if (isCenterAimTagId(fiducial.id))
       {
-        txSum += fiducial.txnc;
-        allowedCount++;
+        centerTxSum += fiducial.txnc;
+        centerCount++;
+      }
+      else if (isDirectAimTagId(fiducial.id))
+      {
+        directTxSum += fiducial.txnc;
+        directCount++;
       }
     }
 
-    if (allowedCount > 0)
+    // If 2+ center tags are visible, aim at the center between them.
+    if (centerCount >= 2)
     {
-      return txSum / allowedCount;
+      return centerTxSum / centerCount;
+    }
+
+    // Otherwise, prioritize aiming directly at tag 26/10 when visible.
+    if (directCount > 0)
+    {
+      return directTxSum / directCount;
+    }
+
+    // With only one center-list tag, still aim directly at that tag.
+    if (centerCount == 1)
+    {
+      return centerTxSum;
     }
 
     return hasAllowedLimelightTarget(limelightName) ? LimelightHelpers.getTX(limelightName) : Double.NaN;

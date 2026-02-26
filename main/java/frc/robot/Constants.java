@@ -61,7 +61,9 @@ public final class Constants
     public static final double AIM_KD = 0.002;
     public static final double AIM_TOLERANCE_DEGREES = 0.5;
     public static final double AIM_MAX_ANGULAR_VELOCITY_RAD_PER_SEC = 4.0;
-    public static final int[] ALLOWED_AIM_TAG_IDS = {8, 10, 2, 27, 26, 24};
+    public static final int[] DIRECT_AIM_TAG_IDS = {26, 10};
+    public static final int[] CENTER_AIM_TAG_IDS = {8, 5, 11, 2, 18, 27, 21, 24};
+    public static final int[] ALLOWED_AIM_TAG_IDS = {26, 10, 8, 5, 11, 2, 18, 27, 21, 24};
     // Linear calibration for Limelight distance inches: calibrated = raw * scale + offset.
     // Defaults fit two tape-measure points: (raw 68.0 -> true 68.0), (raw 103.5 -> true 105.0).
     public static final double LIMELIGHT_DISTANCE_SCALE = 1.0422535;
@@ -85,6 +87,7 @@ public final class Constants
     public static final double SHOOTER_INTAKE_POWER = 0.99;
     public static final double SHOOTER_POWER_AT_5FT = 0.35;
     public static final double SHOOTER_POWER_AT_10FT = 0.55;
+    public static final double SHOOTER_POWER_NO_TAG_DEFAULT = 0.50;
     public static final double SHOOTER_POWER_AT_15FT = 0.80;
     public static final double SHOOTER_POWER_AT_20FT = 0.95;
     public static final double SHOOTER_POWER_TOLERANCE = 0.02;
