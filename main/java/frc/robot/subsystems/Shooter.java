@@ -95,7 +95,7 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
   }
 
   public boolean atPower() {
-    return Math.abs(getShooterPower() - ShooterConstants.SHOOTER_POWER_AT_10FT)
+    return Math.abs(getShooterPower() - ShooterConstants.SHOOTER_POWER_NO_TAG_DEFAULT)
         <= ShooterConstants.SHOOTER_POWER_TOLERANCE;
   }
 
@@ -105,31 +105,30 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
     }
 
     double distanceFeet = distanceInches / 12.0;
-    double[] distancePoints = {5.0, 10.0, 15.0, 20.0};
-    double[] powerPoints = {
-        ShooterConstants.SHOOTER_POWER_AT_5FT,
-        ShooterConstants.SHOOTER_POWER_AT_10FT,
-        ShooterConstants.SHOOTER_POWER_AT_15FT,
-        ShooterConstants.SHOOTER_POWER_AT_20FT};
 
-    if (distanceFeet <= distancePoints[0]) {
-      return MathUtil.clamp(powerPoints[0], -1.0, 1.0);
+    double x0 = 3.0;
+    double x1 = 6.0;
+    double x2 = 9.0;
+
+    double p0 = ShooterConstants.SHOOTER_POWER_AT_3FT;
+    double p1 = ShooterConstants.SHOOTER_POWER_AT_6FT;
+    double p2 = ShooterConstants.SHOOTER_POWER_AT_9FT;
+
+    if (distanceFeet <= x0) {
+      return MathUtil.clamp(p0, -1.0, 1.0);
     }
 
-    if (distanceFeet >= distancePoints[distancePoints.length - 1]) {
-      return MathUtil.clamp(powerPoints[powerPoints.length - 1], -1.0, 1.0);
+    if (distanceFeet >= x2) {
+      return MathUtil.clamp(p2, -1.0, 1.0);
     }
 
-    for (int i = 0; i < distancePoints.length - 1; i++) {
-      double lowDistance = distancePoints[i];
-      double highDistance = distancePoints[i + 1];
-      if (distanceFeet >= lowDistance && distanceFeet <= highDistance) {
-        double t = (distanceFeet - lowDistance) / (highDistance - lowDistance);
-        return MathUtil.clamp(MathUtil.interpolate(powerPoints[i], powerPoints[i + 1], t), -1.0, 1.0);
-      }
-    }
+    // Quadratic (non-linear) interpolation through 3/6/9 ft points.
+    double l0 = ((distanceFeet - x1) * (distanceFeet - x2)) / ((x0 - x1) * (x0 - x2));
+    double l1 = ((distanceFeet - x0) * (distanceFeet - x2)) / ((x1 - x0) * (x1 - x2));
+    double l2 = ((distanceFeet - x0) * (distanceFeet - x1)) / ((x2 - x0) * (x2 - x1));
 
-    return MathUtil.clamp(ShooterConstants.SHOOTER_POWER_NO_TAG_DEFAULT, -1.0, 1.0);
+    double interpolated = p0 * l0 + p1 * l1 + p2 * l2;
+    return MathUtil.clamp(interpolated, -1.0, 1.0);
   }
 
   public Command runAgitatorPower(double power) {
@@ -168,7 +167,7 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
   }
 
   public Command runShooterPower() {
-    return runShooterPower(ShooterConstants.SHOOTER_POWER_AT_10FT);
+    return runShooterPower(ShooterConstants.SHOOTER_POWER_NO_TAG_DEFAULT);
   }
 
   public Command spinUpForDistanceCommand(DoubleSupplier distanceInchesSupplier) {
