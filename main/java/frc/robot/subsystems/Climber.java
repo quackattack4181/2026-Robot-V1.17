@@ -38,12 +38,53 @@ public class Climber extends SubsystemBase implements AutoCloseable {
     rightClimberMotor.configure(rightConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
+  private double normalizeAngleDegrees(double angleDegrees) {
+    return ((angleDegrees % 360.0) + 360.0) % 360.0;
+  }
+
+  private double backwardDistanceDegrees(double fromDegrees, double toDegrees) {
+    return (normalizeAngleDegrees(fromDegrees) - normalizeAngleDegrees(toDegrees) + 360.0) % 360.0;
+  }
+
+  private boolean isWithinAllowedArc(double angleDegrees) {
+    double maxTravel = backwardDistanceDegrees(
+        ClimberConstants.MAX_FORWARD_ANGLE_DEGREES,
+        ClimberConstants.MAX_BACKWARD_ANGLE_DEGREES);
+    double travelToCurrent = backwardDistanceDegrees(ClimberConstants.MAX_FORWARD_ANGLE_DEGREES, angleDegrees);
+    return travelToCurrent <= maxTravel;
+  }
+
+  private boolean isPastForwardLimit(double angleDegrees) {
+    if (isWithinAllowedArc(angleDegrees)) {
+      return Math.abs(shortestSignedErrorDegrees(angleDegrees, ClimberConstants.MAX_FORWARD_ANGLE_DEGREES))
+          <= ClimberConstants.POSITION_TOLERANCE_DEGREES;
+    }
+
+    double distanceToForward = Math.abs(shortestSignedErrorDegrees(angleDegrees, ClimberConstants.MAX_FORWARD_ANGLE_DEGREES));
+    double distanceToBackward = Math.abs(shortestSignedErrorDegrees(angleDegrees, ClimberConstants.MAX_BACKWARD_ANGLE_DEGREES));
+    return distanceToForward <= distanceToBackward;
+  }
+
+  private boolean isPastBackwardLimit(double angleDegrees) {
+    if (isWithinAllowedArc(angleDegrees)) {
+      return Math.abs(shortestSignedErrorDegrees(angleDegrees, ClimberConstants.MAX_BACKWARD_ANGLE_DEGREES))
+          <= ClimberConstants.POSITION_TOLERANCE_DEGREES;
+    }
+
+    double distanceToForward = Math.abs(shortestSignedErrorDegrees(angleDegrees, ClimberConstants.MAX_FORWARD_ANGLE_DEGREES));
+    double distanceToBackward = Math.abs(shortestSignedErrorDegrees(angleDegrees, ClimberConstants.MAX_BACKWARD_ANGLE_DEGREES));
+    return distanceToBackward < distanceToForward;
+  }
+
   public void setClimberPower(double power) {
     double clampedPower = Math.max(-ClimberConstants.MAX_ALLOWED_POWER,
                                     Math.min(ClimberConstants.MAX_ALLOWED_POWER, power));
 
     double currentAngle = getClimberAngleDegrees();
-    if (clampedPower > 0.0 && currentAngle >= ClimberConstants.MAX_FORWARD_ANGLE_DEGREES) {
+    if (clampedPower > 0.0 && isPastForwardLimit(currentAngle)) {
+      clampedPower = 0.0;
+    }
+    if (clampedPower < 0.0 && isPastBackwardLimit(currentAngle)) {
       clampedPower = 0.0;
     }
 

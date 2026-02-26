@@ -126,14 +126,15 @@ public final class Constants
     public static final double POSITION_KP = 0.012;
     public static final double POSITION_MAX_POWER = 0.35;
     public static final double POSITION_MIN_MOVING_POWER = 0.08;
-    public static final double MAX_FORWARD_ANGLE_DEGREES = 190.0;
 
-    // Current tuned climber positions in degrees.
-    public static final double DOWN_ANGLE_DEGREES = 32.0;
-    public static final double LEVEL_ONE_ANGLE_DEGREES = 123.0;
-    public static final double LEVEL_TWO_ANGLE_DEGREES = 123.0;
+    // Current tuned climber positions/limits in degrees.
+    public static final double MAX_FORWARD_ANGLE_DEGREES = 108.0;
+    public static final double MAX_BACKWARD_ANGLE_DEGREES = 32.0;
+    public static final double LEVEL_ONE_ANGLE_DEGREES = MAX_FORWARD_ANGLE_DEGREES;
+    public static final double LEVEL_TWO_ANGLE_DEGREES = MAX_FORWARD_ANGLE_DEGREES;
 
     // Backward-compatible aliases.
+    public static final double DOWN_ANGLE_DEGREES = MAX_BACKWARD_ANGLE_DEGREES;
     public static final double HOME_ANGLE_DEGREES = DOWN_ANGLE_DEGREES;
     public static final double LEVEL1_ANGLE_DEGREES = LEVEL_ONE_ANGLE_DEGREES;
     public static final double LEVEL2_ANGLE_DEGREES = LEVEL_TWO_ANGLE_DEGREES;
