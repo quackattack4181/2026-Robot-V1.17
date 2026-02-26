@@ -129,7 +129,7 @@ public final class Constants
 
     // Current tuned climber positions/limits in degrees.
     public static final double MAX_FORWARD_ANGLE_DEGREES = 108.0;
-    public static final double MAX_BACKWARD_ANGLE_DEGREES = 32.0;
+    public static final double MAX_BACKWARD_ANGLE_DEGREES = 310.0;
     public static final double LEVEL_ONE_ANGLE_DEGREES = MAX_FORWARD_ANGLE_DEGREES;
     public static final double LEVEL_TWO_ANGLE_DEGREES = MAX_FORWARD_ANGLE_DEGREES;
 
