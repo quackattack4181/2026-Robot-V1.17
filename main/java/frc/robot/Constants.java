@@ -131,15 +131,15 @@ public final class Constants
   {
     public static final int PIVOT_MOTOR_ID = 30;
     public static final int WHEEL_MOTOR_ID = 31;
-    public static final boolean PIVOT_INVERTED = false;
+    public static final boolean PIVOT_INVERTED = true;
     public static final boolean WHEEL_INVERTED = false;
     public static final int PIVOT_CURRENT_LIMIT_AMPS = 40;
     public static final int WHEEL_SPARKFLEX_CURRENT_LIMIT_AMPS = 80;
     public static final double PIVOT_POWER = 0.30;
     public static final boolean PIVOT_LIMITS_ENABLED = true;
     public static final double PIVOT_ABSOLUTE_ENCODER_OFFSET_DEGREES = 0.0;
-    public static final double PIVOT_MAX_INWARD_ANGLE = -30.0;
-    public static final double PIVOT_MAX_OUTWARD_ANGLE = 30.0;
+    public static final double PIVOT_MAX_INWARD_ANGLE = -45.0; // -70.0;
+    public static final double PIVOT_MAX_OUTWARD_ANGLE = 85.0; // 100.0;
     public static final double PIVOT_ANGLE_TOLERANCE_DEGREES = 2.0;
     public static final double WHEEL_POWER = 0.80;
   }
