@@ -136,6 +136,7 @@ public final class Constants
     public static final int PIVOT_CURRENT_LIMIT_AMPS = 40;
     public static final int WHEEL_SPARKFLEX_CURRENT_LIMIT_AMPS = 80;
     public static final double PIVOT_POWER = 0.30;
+    public static final boolean PIVOT_LIMITS_ENABLED = true;
     public static final double PIVOT_ABSOLUTE_ENCODER_OFFSET_DEGREES = 0.0;
     public static final double PIVOT_MAX_INWARD_ANGLE = -30.0;
     public static final double PIVOT_MAX_OUTWARD_ANGLE = 30.0;

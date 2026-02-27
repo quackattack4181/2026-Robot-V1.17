@@ -45,12 +45,14 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
 
   public void setPivotPower(double power) {
     double requestedPower = power;
-    double angle = getPivotAngleDegrees();
-    if (requestedPower > 0.0 && angle <= IntakeConstants.PIVOT_MAX_INWARD_ANGLE) {
-      requestedPower = 0.0;
-    }
-    if (requestedPower < 0.0 && angle >= IntakeConstants.PIVOT_MAX_OUTWARD_ANGLE) {
-      requestedPower = 0.0;
+    if (IntakeConstants.PIVOT_LIMITS_ENABLED) {
+      double angle = getPivotAngleDegrees();
+      if (requestedPower > 0.0 && angle >= IntakeConstants.PIVOT_MAX_OUTWARD_ANGLE) {
+        requestedPower = 0.0;
+      }
+      if (requestedPower < 0.0 && angle <= IntakeConstants.PIVOT_MAX_INWARD_ANGLE) {
+        requestedPower = 0.0;
+      }
     }
     pivotMotor.set(requestedPower);
   }

@@ -184,9 +184,9 @@ public class RobotContainer {
 
     intakePivot.setDefaultCommand(intakePivot.run(intakePivot::stop));
     intakeController.povUp().whileTrue(
-        intakePivot.runPivotClockwiseToAngle(IntakeConstants.PIVOT_MAX_INWARD_ANGLE));
-    intakeController.povDown().whileTrue(
         intakePivot.runPivotCounterClockwiseToAngle(IntakeConstants.PIVOT_MAX_OUTWARD_ANGLE));
+    intakeController.povDown().whileTrue(
+        intakePivot.runPivotClockwiseToAngle(IntakeConstants.PIVOT_MAX_INWARD_ANGLE));
 
     // Driver two pivot agitation: hold Back to spin intake wheels and oscillate pivot +/-30 degrees.
     driverTwo.back().whileTrue(intakePivot.runPivotAgitation(30.0, IntakeConstants.WHEEL_POWER));
