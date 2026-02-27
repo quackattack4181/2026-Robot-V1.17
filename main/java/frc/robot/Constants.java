@@ -123,8 +123,8 @@ public final class Constants
     public static final double MAX_ALLOWED_POWER = 1.00;
     public static final double CLIMBER_POWER = 0.85;
     public static final double CLIMBER_ABSOLUTE_ENCODER_OFFSET_DEGREES = 0.0;
-    public static final double MAX_FORWARD_ANGLE_DEGREES = 108.0;
-    public static final double MAX_BACKWARD_ANGLE_DEGREES = -58.0;
+    public static final double MAX_FORWARD_ANGLE_DEGREES = 20.0;
+    public static final double MAX_BACKWARD_ANGLE_DEGREES = -20.0;
   }
 
   public static final class IntakeConstants
