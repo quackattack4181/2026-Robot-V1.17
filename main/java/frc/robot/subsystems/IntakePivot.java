@@ -69,7 +69,8 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
 
   public double getPivotAngleDegrees() {
     double absoluteDegrees = pivotEncoder.get() * 360.0;
-    return wrapToSignedDegrees(absoluteDegrees - IntakeConstants.PIVOT_ABSOLUTE_ENCODER_OFFSET_DEGREES);
+    // Flip sign convention so outward is positive and inward is negative.
+    return -wrapToSignedDegrees(absoluteDegrees - IntakeConstants.PIVOT_ABSOLUTE_ENCODER_OFFSET_DEGREES);
   }
 
   private double shortestSignedErrorDegrees(double currentDegrees, double targetDegrees) {
