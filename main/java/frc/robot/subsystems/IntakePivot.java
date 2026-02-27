@@ -31,20 +31,28 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
 
     SparkMaxConfig pivotConfig = new SparkMaxConfig();
     pivotConfig.idleMode(IdleMode.kBrake);
-    pivotConfig.smartCurrentLimit(IntakeConstants.CURRENT_LIMIT_AMPS);
+    pivotConfig.smartCurrentLimit(IntakeConstants.PIVOT_CURRENT_LIMIT_AMPS);
     pivotConfig.inverted(IntakeConstants.PIVOT_INVERTED);
     pivotMotor.configure(pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     SparkFlexConfig wheelConfig = new SparkFlexConfig();
     wheelConfig.idleMode(IdleMode.kBrake);
-    wheelConfig.smartCurrentLimit(IntakeConstants.CURRENT_LIMIT_AMPS);
+    wheelConfig.smartCurrentLimit(IntakeConstants.WHEEL_SPARKFLEX_CURRENT_LIMIT_AMPS);
     wheelConfig.inverted(IntakeConstants.WHEEL_INVERTED);
     wheelMotor.configure(wheelConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
   }
 
   public void setPivotPower(double power) {
-    pivotMotor.set(power);
+    double requestedPower = power;
+    double angle = getPivotAngleDegrees();
+    if (requestedPower > 0.0 && angle >= IntakeConstants.PIVOT_MAX_OUTWARD_ANGLE) {
+      requestedPower = 0.0;
+    }
+    if (requestedPower < 0.0 && angle <= IntakeConstants.PIVOT_MAX_INWARD_ANGLE) {
+      requestedPower = 0.0;
+    }
+    pivotMotor.set(requestedPower);
   }
 
   public void stop() {
@@ -55,111 +63,62 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
     return startEnd(() -> setPivotPower(power), this::stop);
   }
 
+  private double wrapToSignedDegrees(double degrees) {
+    return ((degrees + 180.0) % 360.0 + 360.0) % 360.0 - 180.0;
+  }
 
   public double getPivotAngleDegrees() {
-    return pivotEncoder.get() * 360.0;
-  }
-
-  private double clockwiseDistanceToTarget(double currentDegrees, double targetDegrees) {
-    return (currentDegrees - targetDegrees + 360.0) % 360.0;
-  }
-
-  private double counterClockwiseDistanceToTarget(double currentDegrees, double targetDegrees) {
-    return (targetDegrees - currentDegrees + 360.0) % 360.0;
+    double absoluteDegrees = pivotEncoder.get() * 360.0;
+    return wrapToSignedDegrees(absoluteDegrees - IntakeConstants.PIVOT_ABSOLUTE_ENCODER_OFFSET_DEGREES);
   }
 
   private double shortestSignedErrorDegrees(double currentDegrees, double targetDegrees) {
-    return ((targetDegrees - currentDegrees + 540.0) % 360.0) - 180.0;
-  }
-
-  private boolean isInForbiddenShortArc(double currentDegrees) {
-    return currentDegrees > IntakeConstants.PIVOT_IN_ANGLE_DEGREES
-        && currentDegrees < IntakeConstants.PIVOT_OUT_ANGLE_DEGREES;
-  }
-
-  private boolean isPastOutLimit(double currentDegrees) {
-    if (!isInForbiddenShortArc(currentDegrees)) {
-      return false;
-    }
-
-    double distanceToIn = Math.abs(shortestSignedErrorDegrees(currentDegrees, IntakeConstants.PIVOT_IN_ANGLE_DEGREES));
-    double distanceToOut = Math.abs(shortestSignedErrorDegrees(currentDegrees, IntakeConstants.PIVOT_OUT_ANGLE_DEGREES));
-    return distanceToOut <= distanceToIn;
-  }
-
-  private boolean isPastInLimit(double currentDegrees) {
-    if (!isInForbiddenShortArc(currentDegrees)) {
-      return false;
-    }
-
-    double distanceToIn = Math.abs(shortestSignedErrorDegrees(currentDegrees, IntakeConstants.PIVOT_IN_ANGLE_DEGREES));
-    double distanceToOut = Math.abs(shortestSignedErrorDegrees(currentDegrees, IntakeConstants.PIVOT_OUT_ANGLE_DEGREES));
-    return distanceToIn < distanceToOut;
+    return wrapToSignedDegrees(targetDegrees - currentDegrees);
   }
 
   public Command runPivotClockwiseToAngle(double targetDegrees) {
-    final double[] lastRemaining = {Double.POSITIVE_INFINITY};
     return runEnd(
         () -> {
           double current = getPivotAngleDegrees();
-          double remaining = clockwiseDistanceToTarget(current, targetDegrees);
-          boolean reachedTarget = remaining <= IntakeConstants.PIVOT_ANGLE_TOLERANCE_DEGREES;
-          boolean passedTarget = remaining > lastRemaining[0];
-          boolean directionBlockedByLimit = isPastOutLimit(current);
-
-          if (reachedTarget || passedTarget || directionBlockedByLimit) {
+          double error = shortestSignedErrorDegrees(current, targetDegrees);
+          if (Math.abs(error) <= IntakeConstants.PIVOT_ANGLE_TOLERANCE_DEGREES || error > 0.0) {
             stop();
           } else {
             setPivotPower(-Math.abs(IntakeConstants.PIVOT_POWER));
-            lastRemaining[0] = remaining;
           }
         },
-        () -> {
-          lastRemaining[0] = Double.POSITIVE_INFINITY;
-          stop();
-        });
+        this::stop);
   }
 
   public Command runPivotCounterClockwiseToAngle(double targetDegrees) {
-    final double[] lastRemaining = {Double.POSITIVE_INFINITY};
     return runEnd(
         () -> {
           double current = getPivotAngleDegrees();
-          double remaining = counterClockwiseDistanceToTarget(current, targetDegrees);
-          boolean reachedTarget = remaining <= IntakeConstants.PIVOT_ANGLE_TOLERANCE_DEGREES;
-          boolean passedTarget = remaining > lastRemaining[0];
-          boolean directionBlockedByLimit = isPastInLimit(current);
-
-          if (reachedTarget || passedTarget || directionBlockedByLimit) {
+          double error = shortestSignedErrorDegrees(current, targetDegrees);
+          if (Math.abs(error) <= IntakeConstants.PIVOT_ANGLE_TOLERANCE_DEGREES || error < 0.0) {
             stop();
           } else {
             setPivotPower(Math.abs(IntakeConstants.PIVOT_POWER));
-            lastRemaining[0] = remaining;
           }
         },
-        () -> {
-          lastRemaining[0] = Double.POSITIVE_INFINITY;
-          stop();
-        });
+        this::stop);
   }
 
-
   public boolean isNearAngle(double targetDegrees) {
-    double current = getPivotAngleDegrees();
-    double delta = Math.abs(((current - targetDegrees + 540.0) % 360.0) - 180.0);
-    return delta <= IntakeConstants.PIVOT_ANGLE_TOLERANCE_DEGREES;
+    return Math.abs(shortestSignedErrorDegrees(getPivotAngleDegrees(), targetDegrees))
+        <= IntakeConstants.PIVOT_ANGLE_TOLERANCE_DEGREES;
   }
 
   public Command moveToOutAngleCommand() {
-    return runPivotClockwiseToAngle(IntakeConstants.PIVOT_OUT_ANGLE_DEGREES)
-        .until(() -> isNearAngle(IntakeConstants.PIVOT_OUT_ANGLE_DEGREES))
+    return runPivotCounterClockwiseToAngle(IntakeConstants.PIVOT_MAX_OUTWARD_ANGLE)
+        .until(() -> isNearAngle(IntakeConstants.PIVOT_MAX_OUTWARD_ANGLE))
         .withTimeout(2.5)
         .andThen(runOnce(this::stop));
   }
 
   public Command moveToInAngleCommand() {
-    return runPivotCounterClockwiseToAngle(IntakeConstants.PIVOT_IN_ANGLE_DEGREES)
-        .until(() -> isNearAngle(IntakeConstants.PIVOT_IN_ANGLE_DEGREES))
+    return runPivotClockwiseToAngle(IntakeConstants.PIVOT_MAX_INWARD_ANGLE)
+        .until(() -> isNearAngle(IntakeConstants.PIVOT_MAX_INWARD_ANGLE))
         .withTimeout(2.5)
         .andThen(runOnce(this::stop));
   }
@@ -184,20 +143,16 @@ public class IntakePivot extends SubsystemBase implements AutoCloseable {
     return runWheelsPower(IntakeConstants.WHEEL_POWER);
   }
 
-  private double normalizeAngleDegrees(double angleDegrees) {
-    return ((angleDegrees % 360.0) + 360.0) % 360.0;
-  }
-
   public Command runPivotAgitation(double swingDegrees, double wheelPower) {
     return Commands.defer(
         () -> {
           double centerAngle = getPivotAngleDegrees();
-          double inTarget = normalizeAngleDegrees(centerAngle - Math.abs(swingDegrees));
-          double outTarget = normalizeAngleDegrees(centerAngle + Math.abs(swingDegrees));
+          double inTarget = Math.max(IntakeConstants.PIVOT_MAX_INWARD_ANGLE, centerAngle - Math.abs(swingDegrees));
+          double outTarget = Math.min(IntakeConstants.PIVOT_MAX_OUTWARD_ANGLE, centerAngle + Math.abs(swingDegrees));
 
           Command oscillate = Commands.sequence(
-              runPivotCounterClockwiseToAngle(inTarget).withTimeout(1.5),
-              runPivotClockwiseToAngle(outTarget).withTimeout(1.5))
+              runPivotClockwiseToAngle(inTarget).withTimeout(1.5),
+              runPivotCounterClockwiseToAngle(outTarget).withTimeout(1.5))
               .repeatedly();
 
           Command spinWheels = Commands.run(() -> setWheelPower(wheelPower));

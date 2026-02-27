@@ -84,6 +84,7 @@ public final class Constants
     public static final boolean MIDDLE_SHOOTER_INVERTED = true;
 
     public static final int CURRENT_LIMIT_AMPS = 40;
+    public static final int SPARKFLEX_CURRENT_LIMIT_AMPS = 80;
     public static final double SHOOTER_INTAKE_POWER = 0.99;
     public static final double SHOOTER_POWER_AT_3FT = 0.42;
     public static final double SHOOTER_POWER_AT_6FT = 0.53;
@@ -118,25 +119,12 @@ public final class Constants
     public static final int ABSOLUTE_ENCODER_CHANNEL = 8;
     public static final boolean LEFT_CLIMBER_INVERTED = true;
     public static final boolean RIGHT_CLIMBER_INVERTED = false;
-    public static final int CURRENT_LIMIT_AMPS = 40;
+    public static final int SPARKFLEX_CURRENT_LIMIT_AMPS = 80;
     public static final double MAX_ALLOWED_POWER = 1.00;
     public static final double CLIMBER_POWER = 0.85;
-    public static final double POSITION_TOLERANCE_DEGREES = 1.0;
-    public static final double POSITION_KP = 0.012;
-    public static final double POSITION_MAX_POWER = 0.35;
-    public static final double POSITION_MIN_MOVING_POWER = 0.08;
-
-    // Current tuned climber positions/limits in degrees.
+    public static final double CLIMBER_ABSOLUTE_ENCODER_OFFSET_DEGREES = 0.0;
     public static final double MAX_FORWARD_ANGLE_DEGREES = 108.0;
-    public static final double MAX_BACKWARD_ANGLE_DEGREES = 310.0;
-    public static final double LEVEL_ONE_ANGLE_DEGREES = MAX_FORWARD_ANGLE_DEGREES;
-    public static final double LEVEL_TWO_ANGLE_DEGREES = MAX_FORWARD_ANGLE_DEGREES;
-
-    // Backward-compatible aliases.
-    public static final double DOWN_ANGLE_DEGREES = MAX_BACKWARD_ANGLE_DEGREES;
-    public static final double HOME_ANGLE_DEGREES = DOWN_ANGLE_DEGREES;
-    public static final double LEVEL1_ANGLE_DEGREES = LEVEL_ONE_ANGLE_DEGREES;
-    public static final double LEVEL2_ANGLE_DEGREES = LEVEL_TWO_ANGLE_DEGREES;
+    public static final double MAX_BACKWARD_ANGLE_DEGREES = -58.0;
   }
 
   public static final class IntakeConstants
@@ -145,10 +133,12 @@ public final class Constants
     public static final int WHEEL_MOTOR_ID = 31;
     public static final boolean PIVOT_INVERTED = false;
     public static final boolean WHEEL_INVERTED = false;
-    public static final int CURRENT_LIMIT_AMPS = 40;
+    public static final int PIVOT_CURRENT_LIMIT_AMPS = 40;
+    public static final int WHEEL_SPARKFLEX_CURRENT_LIMIT_AMPS = 80;
     public static final double PIVOT_POWER = 0.30;
-    public static final double PIVOT_IN_ANGLE_DEGREES = 20.0;
-    public static final double PIVOT_OUT_ANGLE_DEGREES = 154.0;
+    public static final double PIVOT_ABSOLUTE_ENCODER_OFFSET_DEGREES = 0.0;
+    public static final double PIVOT_MAX_INWARD_ANGLE = -30.0;
+    public static final double PIVOT_MAX_OUTWARD_ANGLE = 30.0;
     public static final double PIVOT_ANGLE_TOLERANCE_DEGREES = 2.0;
     public static final double WHEEL_POWER = 0.80;
   }

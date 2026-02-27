@@ -133,12 +133,6 @@ public class RobotContainer {
         () -> drivebase.getLimelightTargetDistanceInches(VisionConstants.LIMELIGHT_NAME)));
     NamedCommands.registerCommand("runPause5", Commands.waitSeconds(5.0));
 
-    if (OperatorConstants.CLIMBER_ENABLED && climber != null) {
-      NamedCommands.registerCommand("runClimberDown", climber.moveToDown());
-      NamedCommands.registerCommand("runClimberLevel1", climber.moveToLevel1());
-      NamedCommands.registerCommand("runClimberLevel2", climber.moveToLevel2());
-    }
-
     // Auto-discover PathPlanner autos/paths from deploy and publish to Elastic.
     loadAutoOptions();
     
@@ -190,22 +184,15 @@ public class RobotContainer {
 
     intakePivot.setDefaultCommand(intakePivot.run(intakePivot::stop));
     intakeController.povUp().whileTrue(
-        intakePivot.runPivotCounterClockwiseToAngle(IntakeConstants.PIVOT_IN_ANGLE_DEGREES));
+        intakePivot.runPivotClockwiseToAngle(IntakeConstants.PIVOT_MAX_INWARD_ANGLE));
     intakeController.povDown().whileTrue(
-        intakePivot.runPivotClockwiseToAngle(IntakeConstants.PIVOT_OUT_ANGLE_DEGREES));
+        intakePivot.runPivotCounterClockwiseToAngle(IntakeConstants.PIVOT_MAX_OUTWARD_ANGLE));
 
     // Driver two pivot agitation: hold Back to spin intake wheels and oscillate pivot +/-30 degrees.
     driverTwo.back().whileTrue(intakePivot.runPivotAgitation(30.0, IntakeConstants.WHEEL_POWER));
 
     if (OperatorConstants.CLIMBER_ENABLED && climber != null) {
-      // Climber controls are on driver two only.
-      // A/X/Y are press-to-target commands that continue to hold that target angle until interrupted.
-      driverTwo.a().onTrue(climber.moveToDown());
-      driverTwo.x().onTrue(climber.moveToLevel1());
-      driverTwo.y().onTrue(climber.moveToLevel2());
-
-      // Manual override controls for either direction.
-      // Left bumper moves hooks forward (angle increases); right bumper moves hooks backward (angle decreases).
+      // Climber controls are bumper-only on driver two.
       driverTwo.leftBumper().whileTrue(climber.runClimberPower(ClimberConstants.CLIMBER_POWER));
       driverTwo.rightBumper().whileTrue(climber.runClimberPower(-ClimberConstants.CLIMBER_POWER));
     }

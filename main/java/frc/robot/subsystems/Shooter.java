@@ -37,7 +37,7 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
 
     SparkFlexConfig middleConfig = new SparkFlexConfig();
     middleConfig.idleMode(IdleMode.kCoast);
-    middleConfig.smartCurrentLimit(ShooterConstants.CURRENT_LIMIT_AMPS);
+    middleConfig.smartCurrentLimit(ShooterConstants.SPARKFLEX_CURRENT_LIMIT_AMPS);
     middleConfig.inverted(ShooterConstants.MIDDLE_SHOOTER_INVERTED);
     middleShooterMotor.configure(middleConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
