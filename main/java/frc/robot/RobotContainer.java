@@ -183,10 +183,14 @@ public class RobotContainer {
     driverOne.start().onTrue(Commands.runOnce(drivebase::zeroGyro));
 
     intakePivot.setDefaultCommand(intakePivot.run(intakePivot::stop));
-    intakeController.povUp().whileTrue(
-        intakePivot.runPivotCounterClockwiseToAngle(IntakeConstants.PIVOT_MAX_OUTWARD_ANGLE));
-    intakeController.povDown().whileTrue(
-        intakePivot.runPivotClockwiseToAngle(IntakeConstants.PIVOT_MAX_INWARD_ANGLE));
+
+    // Pivot manual control moved from POV to intake controller left stick Y.
+    // Forward stick (negative Y) behaves like previous POV up.
+    // Backward stick (positive Y) behaves like previous POV down.
+    new Trigger(() -> intakeController.getLeftY() < -0.5)
+        .whileTrue(intakePivot.runPivotPower(IntakeConstants.PIVOT_POWER));
+    new Trigger(() -> intakeController.getLeftY() > 0.5)
+        .whileTrue(intakePivot.runPivotPower(-IntakeConstants.PIVOT_POWER));
 
     // Driver two pivot agitation: hold Back to spin intake wheels and oscillate pivot +/-30 degrees.
     driverTwo.back().whileTrue(intakePivot.runPivotAgitation(30.0, IntakeConstants.WHEEL_POWER));
