@@ -90,6 +90,8 @@ public final class Constants
     public static final double SHOOTER_POWER_AT_6FT = 0.53;
     public static final double SHOOTER_POWER_AT_9FT = 0.65;
     public static final double SHOOTER_POWER_NO_TAG_DEFAULT = 0.65;
+    public static final boolean SHOOTER_CALIBRATION_MODE_ENABLED = false;
+    public static final double SHOOTER_CALIBRATION_DEFAULT_POWER = 0.40;
     public static final double SHOOTER_POWER_TOLERANCE = 0.02;
     public static final double SHOOTER_INTAKE_START_DELAY_SECONDS = 1;
 

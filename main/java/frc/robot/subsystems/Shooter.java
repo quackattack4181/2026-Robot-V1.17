@@ -9,6 +9,8 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -20,6 +22,7 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
   private final SparkMax shooterIntakeMotor;
   private final SparkMax agitatorMotorOne;
   private final SparkMax agitatorMotorTwo;
+  private final NetworkTableEntry shooterCalibrationPowerEntry;
 
   private double currentShooterPower = 0.0;
 
@@ -28,6 +31,10 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
     middleShooterMotor = new SparkFlex(ShooterConstants.MIDDLE_SHOOTER_MOTOR_ID, MotorType.kBrushless);
     agitatorMotorOne = new SparkMax(ShooterConstants.AGITATOR_MOTOR_ONE_ID, MotorType.kBrushless);
     agitatorMotorTwo = new SparkMax(ShooterConstants.AGITATOR_MOTOR_TWO_ID, MotorType.kBrushless);
+    shooterCalibrationPowerEntry = NetworkTableInstance.getDefault()
+        .getTable("Elastic")
+        .getEntry("Shooter Calibration Power");
+    shooterCalibrationPowerEntry.setDouble(ShooterConstants.SHOOTER_CALIBRATION_DEFAULT_POWER);
 
     SparkMaxConfig intakeConfig = new SparkMaxConfig();
     intakeConfig.idleMode(IdleMode.kCoast);
@@ -100,6 +107,13 @@ public class Shooter extends SubsystemBase implements AutoCloseable {
   }
 
   public double getTargetPowerForDistanceInches(double distanceInches) {
+    if (ShooterConstants.SHOOTER_CALIBRATION_MODE_ENABLED) {
+      return MathUtil.clamp(
+          shooterCalibrationPowerEntry.getDouble(ShooterConstants.SHOOTER_CALIBRATION_DEFAULT_POWER),
+          -1.0,
+          1.0);
+    }
+
     if (Double.isNaN(distanceInches) || Double.isInfinite(distanceInches)) {
       return ShooterConstants.SHOOTER_POWER_NO_TAG_DEFAULT;
     }
